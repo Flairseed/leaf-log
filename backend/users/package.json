@@ -1,0 +1,11 @@
+{
+  "name": "leaf-log-backend",
+  "version": "1.0.0",
+  "description": "Backend for the Temasek Polytechnic Y2.2 Mobile App Project (DVOPS+FWEB+ITAD).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jay",
+  "license": "ISC"
+}
