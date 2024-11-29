@@ -1,6 +1,13 @@
+const { response } = require("./functions/response-functions");
+const {
+  connectToDatabase,
+  userRegister,
+  userLogin,
+} = require("./functions/database-functions");
 
 exports.handler = async (event, context) => {
   context.callbackWaitsForEmptyEventLoop = false;
+  await connectToDatabase();
 
   let body;
   let res;
@@ -9,8 +16,12 @@ exports.handler = async (event, context) => {
 
   switch (event.routeKey) {
     case "POST users/register":
+      body = JSON.parse(event.body);
+      res = await userRegister(body);
       break;
     case "POST users/login":
+      body = JSON.parse(event.body);
+      res = await userLogin(body);
       break;
   }
-}
+};
