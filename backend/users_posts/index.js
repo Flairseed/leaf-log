@@ -23,5 +23,8 @@ exports.handler = async (event, context) => {
       body = JSON.parse(event.body);
       res = await userLogin(body);
       break;
+    default:
+      res = response(404, { message: "Unsupported route: " + event.routeKey });
   }
+  return res;
 };
