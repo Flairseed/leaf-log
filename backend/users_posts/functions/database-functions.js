@@ -25,8 +25,8 @@ async function userRegister(req) {
   }
 
   try {
-    const sql = "INSERT INTO user(name, pasword) VALUES(?, ?)";
-    const queryValues = [req.name, req.pasword];
+    const sql = "INSERT INTO user(name, password) VALUES(?, ?)";
+    const queryValues = [req.name, req.password];
 
     await connection.query(sql, queryValues);
     return response(200, {

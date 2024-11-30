@@ -15,11 +15,11 @@ exports.handler = async (event, context) => {
   let id;
 
   switch (event.routeKey) {
-    case "POST users/register":
+    case "POST /users/register":
       body = JSON.parse(event.body);
       res = await userRegister(body);
       break;
-    case "POST users/login":
+    case "POST /users/login":
       body = JSON.parse(event.body);
       res = await userLogin(body);
       break;
