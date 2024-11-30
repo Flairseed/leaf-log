@@ -7,7 +7,6 @@ on:
       - ".github/workflows/**"
     branches: 
       - main
-      - feature/users
   workflow_dispatch:
 
 jobs:
