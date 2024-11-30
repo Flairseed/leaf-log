@@ -25,6 +25,14 @@ async function userRegister(req) {
   }
 
   try {
+    const findSql = "SElECT * FROM user WHERE name = ?"
+    const [users, fields] = await connection.query(findSql, [req.name]);
+    if (users.length !== 0) {
+      return response(403, {
+        message: `User with name ${req.name} is already registered.`
+      });
+    }
+
     const sql = "INSERT INTO user(name, password) VALUES(?, ?)";
     const queryValues = [req.name, req.password];
 
