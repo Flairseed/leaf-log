@@ -1,0 +1,41 @@
+name: Deploy users_posts lambda function
+
+on:
+  push:
+    paths:
+      - "backend/users_posts/**"
+      - ".github/workflows/**"
+    branches: 
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 20
+      - uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+      - name: npm install
+        working-directory: ./backend/users_posts/
+        env:
+          CI: true
+        run: |
+          npm ci
+      - name: run test cases
+        run: |
+          cd ./backend/users_posts
+          npm test
+      - name: deploy
+        run: |
+          cd ./backend/users_posts
+          zip -r ../../deploy-users_posts.zip ./
+          cd ../../
+          aws lambda update-function-code --function-name=users_posts --zip-file=fileb://deploy-users_posts.zip 
