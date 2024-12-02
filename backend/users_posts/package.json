@@ -4,13 +4,15 @@
   "description": "Backend for the Temasek Polytechnic Y2.2 Mobile App Project (DVOPS+FWEB+ITAD).",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "Jay",
   "license": "ISC",
   "dependencies": {
+    "@types/jest": "^29.5.14",
     "ajv": "^8.17.1",
     "dotenv": "^16.4.5",
+    "jest": "^29.7.0",
     "mysql2": "^3.11.5"
   }
 }
