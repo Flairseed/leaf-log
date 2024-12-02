@@ -29,6 +29,10 @@ jobs:
           CI: true
         run: |
           npm ci
+      - name: run test cases
+        run: |
+          cd ./backend/users_posts
+          npm test
       - name: deploy
         run: |
           cd ./backend/users_posts
