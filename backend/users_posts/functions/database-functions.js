@@ -56,11 +56,13 @@ async function userLogin(req) {
   }
 
   try {
-    const sql = "SELECT * FROM user WHERE name = ?";
-    const [users, fields] = await connection.query(sql, [req.name]);
-    if (users.length === 0 || users[0].password !== req.password) {
+    const sql = "SELECT * FROM user WHERE name = ? AND password = ?";
+    const queryValues = [req.name, req.password];
+
+    const [users, fields] = await connection.query(sql, queryValues);
+    if (users.length === 0) {
       return response(403, {
-        message: "Username or password is incorrect",
+        message: "Username or password is incorrect.",
       });
     } else {
       return response(200, {
