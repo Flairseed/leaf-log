@@ -170,10 +170,53 @@ async function updatePost(postId, req) {
   }
 }
 
+async function deletePost(userId, postId) {
+  if (!Number.isInteger(+userId)) {
+    return response(400, {
+      messgae: `${userId} is not a valid user id. User id must be an integer.`,
+    });
+  }
+
+  if (!Number.isInteger(+postId)) {
+    return response(400, {
+      messgae: `${postId} is not a valid post id. Post id must be an integer.`,
+    });
+  }
+
+  const selectSql = "SELECT * FROM post WHERE id = ?";
+  const [posts, fields] = await connection.query(selectSql, [postId]);
+  if (posts.length === 0) {
+    return response(404, {
+      message: `Post with id of ${postId} does not exist.`,
+    });
+  } else if (posts[0].userId !== userId) {
+    return response(403, {
+      message: `User with id of ${userId} is not allowed to delete post of id ${postId}.`,
+    });
+  }
+
+  try {
+    const deleteSql = "DELETE FROM post WHERE id = ?";
+
+    await connection.query(deleteSql, [postId]);
+
+    return response(200, {
+      message: "Post successfully deleted.",
+    });
+  } catch (err) {
+    console.log(err);
+    return response(500, {
+      message: "Internal server error.",
+    });
+  }
+}
+
+
 module.exports = {
   connectToDatabase,
   userRegister,
   userLogin,
   createPost,
   updatePost,
+  deletePost,
 };
