@@ -173,13 +173,13 @@ async function updatePost(postId, req) {
 async function deletePost(userId, postId) {
   if (!Number.isInteger(+userId)) {
     return response(400, {
-      messgae: `${userId} is not a valid user id. User id must be an integer.`,
+      message: `${userId} is not a valid user id. User id must be an integer.`,
     });
   }
 
   if (!Number.isInteger(+postId)) {
     return response(400, {
-      messgae: `${postId} is not a valid post id. Post id must be an integer.`,
+      message: `${postId} is not a valid post id. Post id must be an integer.`,
     });
   }
 
@@ -189,7 +189,7 @@ async function deletePost(userId, postId) {
     return response(404, {
       message: `Post with id of ${postId} does not exist.`,
     });
-  } else if (posts[0].userId !== userId) {
+  } else if (posts[0].user_id !== userId) {
     return response(403, {
       message: `User with id of ${userId} is not allowed to delete post of id ${postId}.`,
     });
