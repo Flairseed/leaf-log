@@ -317,15 +317,15 @@ describe("updatePost", () => {
     // Updating the post
     expect(mockQuery).toHaveBeenNthCalledWith(
       2,
-      "UPDATE post SET user_id = ?, title = ?, description = ?, height = ?, water = ?, light_level = ?, " + 
-      "relative_humidity = ?, temperature = ?, picture = ?, created = ? WHERE id = ?",
-      argInputs,
+      "UPDATE post SET user_id = ?, title = ?, description = ?, height = ?, water = ?, light_level = ?, " +
+        "relative_humidity = ?, temperature = ?, picture = ?, created = ? WHERE id = ?",
+      argInputs
     );
   });
 
   it("should fail immediately with wrongly formatted postId", async () => {
     // postId should be an integer
-    postId = "dawdohe233"
+    postId = "dawdohe233";
 
     expect(await updatePost(postId, {})).toEqual({
       statusCode: 400,
@@ -353,10 +353,9 @@ describe("updatePost", () => {
       }),
     });
 
-    expect(mockQuery).toHaveBeenCalledWith(
-      "SELECT * FROM post WHERE id = ?",
-      [postId]
-    )
+    expect(mockQuery).toHaveBeenCalledWith("SELECT * FROM post WHERE id = ?", [
+      postId,
+    ]);
 
     expect(mockQuery).toHaveBeenCalledTimes(1); // Update query should not have been called
   });
@@ -401,10 +400,9 @@ describe("updatePost", () => {
       }),
     });
 
-    expect(mockQuery).toHaveBeenCalledWith(
-      "SELECT * FROM post WHERE id = ?",
-      [postId]
-    )
+    expect(mockQuery).toHaveBeenCalledWith("SELECT * FROM post WHERE id = ?", [
+      postId,
+    ]);
 
     expect(mockQuery).toHaveBeenCalledTimes(1); // Update query should not have been called
   });
@@ -438,8 +436,8 @@ describe("updatePost", () => {
       picture: "https://mybucket.s3.amazonaws.com/myfolder/afile.jpg",
       created: "4/12/2024",
     };
-    postId = 1
-    
+    postId = 1;
+
     mockQuery.mockImplementationOnce((sql, postId) => [testData, {}]);
 
     expect(await updatePost(postId, req)).toEqual({
@@ -447,15 +445,147 @@ describe("updatePost", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         message: "There were some errors in your request body",
-        errors: ["/created: must match format \"date\""],
+        errors: ['/created: must match format "date"'],
       }),
     });
 
-    expect(mockQuery).toHaveBeenCalledWith(
-      "SELECT * FROM post WHERE id = ?",
-      [postId]
-    )
+    expect(mockQuery).toHaveBeenCalledWith("SELECT * FROM post WHERE id = ?", [
+      postId,
+    ]);
 
     expect(mockQuery).toHaveBeenCalledTimes(1); // Update query should not have been called
+  });
+});
+
+describe("deletePost", () => {
+  it("should successfully delete post if given user id and post id is correct", async () => {
+    const testData = [
+      {
+        user_id: 1,
+        title: "day one",
+        description: "The plant is growing well.",
+        height: 0,
+        water: 20,
+        light_level: 5000,
+        relative_humidity: 50,
+        temperature: 30,
+        picture: "https://mybucket.s3.amazonaws.com/myfolder/afile.jpg",
+        created: "2024-12-04",
+      },
+    ];
+    postId = 1;
+    userId = 1;
+
+    mockQuery.mockImplementationOnce((sql, postId) => [testData, {}]); // Checking if post exists
+
+    expect(await deletePost(userId, postId)).toEqual({
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: "Post successfully deleted.",
+      }),
+    });
+
+    // Checking if post exists
+    expect(mockQuery).toHaveBeenNthCalledWith(
+      1,
+      "SELECT * FROM post WHERE id = ?",
+      [postId]
+    );
+
+    // Deleting the post
+    expect(mockQuery).toHaveBeenNthCalledWith(
+      2,
+      "DELETE FROM post WHERE id = ?",
+      [postId]
+    );
+  });
+
+  it("should fail immediately with wrongly formatted userId", async () => {
+    // userId should be an integer
+    userId = "dawdohe233";
+
+    expect(await deletePost(userId, 1)).toEqual({
+      statusCode: 400,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: `${userId} is not a valid user id. User id must be an integer.`,
+      }),
+    });
+
+    expect(mockQuery).toHaveBeenCalledTimes(0); // Main function should have returned early
+  });
+
+  it("should fail immediately with wrongly formatted postId", async () => {
+    // postId should be an integer
+    postId = "dawdohe233";
+
+    expect(await deletePost(1, postId)).toEqual({
+      statusCode: 400,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: `${postId} is not a valid post id. Post id must be an integer.`,
+      }),
+    });
+
+    expect(mockQuery).toHaveBeenCalledTimes(0); // Main function should have returned early
+  });
+  
+  it("should fail deleting if post with given id does not exist", async () => {
+    // Empty because post with given id does not exist
+    testData = [];
+    postId = 1;
+
+    mockQuery.mockImplementationOnce((sql, postId) => [testData, {}]);
+
+    expect(await deletePost(1, postId)).toEqual({
+      statusCode: 404,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: `Post with id of ${postId} does not exist.`,
+      }),
+    });
+
+    expect(mockQuery).toHaveBeenCalledWith("SELECT * FROM post WHERE id = ?", [
+      postId,
+    ]);
+
+    expect(mockQuery).toHaveBeenCalledTimes(1); // Delete query should not have been called
+  });
+
+  it("Should fail deleting if user id of post does not match given user id", async () => {
+    const testData = [
+      {
+        user_id: 2,
+        title: "day one",
+        description: "The plant is growing well.",
+        height: 0,
+        water: 20,
+        light_level: 5000,
+        relative_humidity: 50,
+        temperature: 30,
+        picture: "https://mybucket.s3.amazonaws.com/myfolder/afile.jpg",
+        created: "2024-12-04",
+      },
+    ];
+
+    userId = 1;
+    postId = 1;
+
+    mockQuery.mockImplementationOnce((sql, postId) => [testData, {}]);
+
+    expect(await deletePost(userId, postId)).toEqual({
+      statusCode: 403,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: `User with id of ${userId} is not allowed to delete post of id ${postId}.`,
+      }),
+    });
+
+    expect(mockQuery).toHaveBeenCalledWith("SELECT * FROM post WHERE id = ?", [
+      postId,
+    ]);
+
+    expect(mockQuery).toHaveBeenCalledTimes(1); // Delete query should not have been called
   });
 });
