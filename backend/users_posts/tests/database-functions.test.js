@@ -106,7 +106,7 @@ describe("userRegister", () => {
 });
 
 describe("userLogin", () => {
-  it("should succesffully login a user that gives the correct username and password.", async () => {
+  it("should successfully login a user that gives the correct username and password", async () => {
     const testData = [
       {
         id: 1,
