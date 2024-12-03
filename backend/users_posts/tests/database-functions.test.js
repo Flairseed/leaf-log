@@ -282,6 +282,7 @@ describe("updatePost", () => {
       picture: "https://mybucket.s3.amazonaws.com/myfolder/afile.jpg",
       created: "2024-12-04",
     };
+    postId = 1;
 
     const argInputs = [
       1,
@@ -294,12 +295,12 @@ describe("updatePost", () => {
       30,
       "https://mybucket.s3.amazonaws.com/myfolder/afile.jpg",
       "2024-12-04",
-      1, // the postId
+      postId,
     ];
 
     mockQuery.mockImplementationOnce((sql, postId) => [testData, {}]); // Checking if post exists
 
-    expect(await updatePost(1, req)).toEqual({
+    expect(await updatePost(postId, req)).toEqual({
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -311,7 +312,7 @@ describe("updatePost", () => {
     expect(mockQuery).toHaveBeenNthCalledWith(
       1,
       "SELECT * FROM post WHERE id = ?",
-      [1]
+      [postId]
     );
 
     // Updating the post
@@ -530,7 +531,7 @@ describe("deletePost", () => {
 
     expect(mockQuery).toHaveBeenCalledTimes(0); // Main function should have returned early
   });
-  
+
   it("should fail deleting if post with given id does not exist", async () => {
     // Empty because post with given id does not exist
     testData = [];
