@@ -7,7 +7,6 @@ const {
   deletePost,
   getPosts,
 } = require("../functions/database-functions");
-const mysql2 = require("mysql2");
 
 let mockQuery = jest.fn();
 jest.mock("mysql2/promise", () => ({
@@ -194,9 +193,9 @@ describe("createPost", () => {
       relativeHumidity: 87,
       temperature: 30,
       picture: "https://mybucket.s3.amazonaws.com/myfolder/afile.jpg",
-      created: "2024-12-04"
+      created: "2024-12-04",
     };
-    
+
     const argInputs = [
       1,
       "day one",
@@ -220,8 +219,8 @@ describe("createPost", () => {
 
     expect(mockQuery).toHaveBeenCalledWith(
       "INSERT INTO post(user_id, title, description, height, water, light_level, relative_humidity, temperature, picture, created) " +
-      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-      argInputs,
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      argInputs
     );
   });
 
@@ -236,7 +235,7 @@ describe("createPost", () => {
       relativeHumidity: 87,
       temperature: 30,
       picture: "https://mybucket.s3.amazonaws.com/myfolder/afile.jpg",
-      created: "2024-12-04"
+      created: "2024-12-04",
     };
 
     expect(await createPost(req)).toEqual({
@@ -244,13 +243,219 @@ describe("createPost", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         message: "There were some errors in your request body",
-        errors: [
-          "/userId: must have required property 'userId'",
-        ],
+        errors: ["/userId: must have required property 'userId'"],
       }),
     });
 
     // Main function should have returned before any database calls.
     expect(mockQuery).toHaveBeenCalledTimes(0);
+  });
+});
+
+describe("updatePost", () => {
+  it("should successfully update the post given a properly formatted input.", async () => {
+    // Should return user's existing post
+    const testData = [
+      {
+        user_id: 1,
+        title: "day one",
+        description: "The plant is growing well.",
+        height: 0,
+        water: 20,
+        light_level: 5000,
+        relative_humidity: 50,
+        temperature: 30,
+        picture: "https://mybucket.s3.amazonaws.com/myfolder/afile.jpg",
+        created: "2024-12-04",
+      },
+    ];
+
+    const req = {
+      userId: 1,
+      title: "day one",
+      description: "The plant is growing well.",
+      height: 0,
+      water: 50,
+      lightLevel: 10000,
+      relativeHumidity: 87,
+      temperature: 30,
+      picture: "https://mybucket.s3.amazonaws.com/myfolder/afile.jpg",
+      created: "2024-12-04",
+    };
+
+    const argInputs = [
+      1,
+      "day one",
+      "The plant is growing well.",
+      0,
+      50,
+      10000,
+      87,
+      30,
+      "https://mybucket.s3.amazonaws.com/myfolder/afile.jpg",
+      "2024-12-04",
+      1, // the postId
+    ];
+
+    mockQuery.mockImplementationOnce((sql, postId) => [testData, {}]); // Checking if post exists
+
+    expect(await updatePost(1, req)).toEqual({
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: "Post successfully updated.",
+      }),
+    });
+
+    // Checking if post exists
+    expect(mockQuery).toHaveBeenNthCalledWith(
+      1,
+      "SELECT * FROM post WHERE id = ?",
+      [1]
+    );
+
+    // Updating the post
+    expect(mockQuery).toHaveBeenNthCalledWith(
+      2,
+      "UPDATE post SET user_id = ?, title = ?, description = ?, height = ?, water = ?, light_level = ?, " + 
+      "relative_humidity = ?, temperature = ?, picture = ?, created = ? WHERE id = ?",
+      argInputs,
+    );
+  });
+
+  it("should fail immediately with wrongly formatted postId", async () => {
+    // postId should be an integer
+    postId = "dawdohe233"
+
+    expect(await updatePost(postId, {})).toEqual({
+      statusCode: 400,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: `${postId} is not a valid post id. Post id must be an integer.`,
+      }),
+    });
+
+    expect(mockQuery).toHaveBeenCalledTimes(0); // Main function should have returned early
+  });
+
+  it("should fail updating if post with given id does not exist", async () => {
+    // Empty because post with given id does not exist
+    testData = [];
+    postId = 1;
+
+    mockQuery.mockImplementationOnce((sql, postId) => [testData, {}]);
+
+    expect(await updatePost(postId, {})).toEqual({
+      statusCode: 404,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: `Post with id of ${postId} does not exist.`,
+      }),
+    });
+
+    expect(mockQuery).toHaveBeenCalledWith(
+      "SELECT * FROM post WHERE id = ?",
+      [postId]
+    )
+
+    expect(mockQuery).toHaveBeenCalledTimes(1); // Update query should not have been called
+  });
+
+  it("Should fail updating if user id of post does not match given user id", async () => {
+    const testData = [
+      {
+        user_id: 2,
+        title: "day one",
+        description: "The plant is growing well.",
+        height: 0,
+        water: 20,
+        light_level: 5000,
+        relative_humidity: 50,
+        temperature: 30,
+        picture: "https://mybucket.s3.amazonaws.com/myfolder/afile.jpg",
+        created: "2024-12-04",
+      },
+    ];
+
+    const req = {
+      userId: 1,
+      title: "day one",
+      description: "The plant is growing well.",
+      height: 0,
+      water: 50,
+      lightLevel: 10000,
+      relativeHumidity: 87,
+      temperature: 30,
+      picture: "https://mybucket.s3.amazonaws.com/myfolder/afile.jpg",
+      created: "2024-12-04",
+    };
+    postId = 1;
+
+    mockQuery.mockImplementationOnce((sql, postId) => [testData, {}]);
+
+    expect(await updatePost(postId, req)).toEqual({
+      statusCode: 403,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: `User with id of ${req.userId} is not allowed to edit post of id ${postId}.`,
+      }),
+    });
+
+    expect(mockQuery).toHaveBeenCalledWith(
+      "SELECT * FROM post WHERE id = ?",
+      [postId]
+    )
+
+    expect(mockQuery).toHaveBeenCalledTimes(1); // Update query should not have been called
+  });
+
+  it("Should fail to update if format of input is wrong", async () => {
+    const testData = [
+      {
+        user_id: 1,
+        title: "day one",
+        description: "The plant is growing well.",
+        height: 0,
+        water: 20,
+        light_level: 5000,
+        relative_humidity: 50,
+        temperature: 30,
+        picture: "https://mybucket.s3.amazonaws.com/myfolder/afile.jpg",
+        created: "2024-12-04",
+      },
+    ];
+
+    // Date format should be yyyy-mm-dd
+    const req = {
+      userId: 1,
+      title: "day one",
+      description: "The plant is growing well.",
+      height: 0,
+      water: 50,
+      lightLevel: 10000,
+      relativeHumidity: 87,
+      temperature: 30,
+      picture: "https://mybucket.s3.amazonaws.com/myfolder/afile.jpg",
+      created: "4/12/2024",
+    };
+    postId = 1
+    
+    mockQuery.mockImplementationOnce((sql, postId) => [testData, {}]);
+
+    expect(await updatePost(postId, req)).toEqual({
+      statusCode: 400,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: "There were some errors in your request body",
+        errors: ["/created: must match format \"date\""],
+      }),
+    });
+
+    expect(mockQuery).toHaveBeenCalledWith(
+      "SELECT * FROM post WHERE id = ?",
+      [postId]
+    )
+
+    expect(mockQuery).toHaveBeenCalledTimes(1); // Update query should not have been called
   });
 });
