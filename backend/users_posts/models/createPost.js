@@ -1,5 +1,5 @@
 const Ajv = require("ajv");
-const { addFormats } = require("ajv-formats");
+const addFormats = require("ajv-formats");
 
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv);
@@ -16,15 +16,6 @@ const createPost = {
       maxLength: 256,
     },
     description: {
-      type: "string",
-      minLength: 1,
-    },
-    title: {
-      type: "string",
-      minLength: 1,
-      maxLength: 256,
-    },
-    body: {
       type: "string",
       minLength: 1,
     },
@@ -48,7 +39,7 @@ const createPost = {
     },
     picture: {
       type: "string",
-      maxLength: "256",
+      maxLength: 256,
       format: "uri",
     },
     created: {
@@ -57,15 +48,16 @@ const createPost = {
     },
   },
   required: [
-    userId,
-    title,
-    description,
-    height,
-    water,
-    lightLevel,
-    relativeHumidity,
-    temperature,
-    picture,
+    "userId",
+    "title",
+    "description",
+    "height",
+    "water",
+    "lightLevel",
+    "relativeHumidity",
+    "temperature",
+    "picture",
+    "created",
   ],
   additionalProperties: false,
 };
