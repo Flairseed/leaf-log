@@ -82,7 +82,7 @@ async function createPost(req) {
   const valid = validateCreatePost(req);
 
   if (!valid) {
-    return response(400, displayErrors(validateUser.errors));
+    return response(400, displayErrors(validateCreatePost.errors));
   }
 
   try {
@@ -136,7 +136,7 @@ async function updatePost(postId, req) {
   const valid = validateCreatePost(req);
 
   if (!valid) {
-    return response(400, displayErrors(validatePost.errors));
+    return response(400, displayErrors(validateCreatePost.errors));
   }
 
   try {
