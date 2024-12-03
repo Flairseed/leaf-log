@@ -2,6 +2,10 @@ const {
   connectToDatabase,
   userRegister,
   userLogin,
+  createPost,
+  updatePost,
+  deletePost,
+  getPosts,
 } = require("../functions/database-functions");
 const mysql2 = require("mysql2");
 
@@ -169,6 +173,79 @@ describe("userLogin", () => {
         errors: [
           "/name: must have required property 'name'",
           "/password: must NOT have fewer than 10 characters",
+        ],
+      }),
+    });
+
+    // Main function should have returned before any database calls.
+    expect(mockQuery).toHaveBeenCalledTimes(0);
+  });
+});
+
+describe("createPost", () => {
+  it("should successfully create a post when given a properly formatted input", async () => {
+    const req = {
+      userId: 1,
+      title: "day one",
+      description: "The plant is growing well.",
+      height: 0,
+      water: 50,
+      lightLevel: 10000,
+      relativeHumidity: 87,
+      temperature: 30,
+      picture: "https://mybucket.s3.amazonaws.com/myfolder/afile.jpg",
+      created: "2024-12-04"
+    };
+    
+    const argInputs = [
+      1,
+      "day one",
+      "The plant is growing well.",
+      0,
+      50,
+      10000,
+      87,
+      30,
+      "https://mybucket.s3.amazonaws.com/myfolder/afile.jpg",
+      "2024-12-04",
+    ];
+
+    expect(await createPost(req)).toEqual({
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: "Successfully created post.",
+      }),
+    });
+
+    expect(mockQuery).toHaveBeenCalledWith(
+      "INSERT INTO post(user_id, title, description, height, water, light_level, relative_humidity, temperature, picture, created) " +
+      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      argInputs,
+    );
+  });
+
+  it("should fail immediately if given format is wrong", async () => {
+    // userId should be provided
+    const req = {
+      title: "day one",
+      description: "The plant is growing well.",
+      height: 0,
+      water: 50,
+      lightLevel: 10000,
+      relativeHumidity: 87,
+      temperature: 30,
+      picture: "https://mybucket.s3.amazonaws.com/myfolder/afile.jpg",
+      created: "2024-12-04"
+    };
+
+    expect(await createPost(req)).toEqual({
+      statusCode: 400,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: "There were some errors in your request body",
+        errors: [
+          "/userId: must have required property 'userId'",
         ],
       }),
     });
