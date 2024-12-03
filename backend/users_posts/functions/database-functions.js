@@ -90,10 +90,9 @@ async function createPost(req) {
       "INSERT INTO post(user_id, title, description, height, water, light_level, relative_humidity, temperature, picture, created) " +
       "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     const queryValues = [
-      req.user_id,
+      req.userId,
       req.title,
-      req,
-      description,
+      req.description,
       req.height,
       req.water,
       req.lightLevel,
@@ -115,9 +114,66 @@ async function createPost(req) {
   }
 }
 
+async function updatePost(postId, req) {
+  if (!Number.isInteger(+postId)) {
+    return response(400, {
+      message: `${postId} is not a valid post id. Post id must be an integer.`,
+    });
+  }
+
+  const selectSql = "SELECT * FROM post WHERE id = ?";
+  const [posts, fields] = await connection.query(selectSql, [postId]);
+  if (posts.length === 0) {
+    return response(404, {
+      message: `Post with id of ${postId} does not exist.`,
+    });
+  } else if (posts[0].user_id !== req.userId) {
+    return response(403, {
+      message: `User with id of ${req.userId} is not allowed to edit post of id ${postId}.`,
+    });
+  }
+
+  const valid = validateCreatePost(req);
+
+  if (!valid) {
+    return response(400, displayErrors(validatePost.errors));
+  }
+
+  try {
+    const updateSql =
+      "UPDATE post SET user_id = ?, title = ?, description = ?, height = ?, water = ?, light_level = ?, " + 
+      "relative_humidity = ?, temperature = ?, picture = ?, created = ? WHERE id = ?";
+    const queryValues = [
+      req.userId,
+      req.title,
+      req.description,
+      req.height,
+      req.water,
+      req.lightLevel,
+      req.relativeHumidity,
+      req.temperature,
+      req.picture,
+      req.created,
+      postId,
+    ];
+
+    const [result, fields] = await connection.query(updateSql, queryValues);
+
+    return response(200, {
+      message: "Post successfully updated.",
+    });
+  } catch (err) {
+    console.log(err);
+    return response(500, {
+      message: "Internal server error.",
+    });
+  }
+}
+
 module.exports = {
   connectToDatabase,
   userRegister,
   userLogin,
   createPost,
+  updatePost,
 };
