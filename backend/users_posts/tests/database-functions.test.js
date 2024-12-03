@@ -590,3 +590,47 @@ describe("deletePost", () => {
     expect(mockQuery).toHaveBeenCalledTimes(1); // Delete query should not have been called
   });
 });
+
+describe("getPosts", () => {
+  it("should return all the posts in the database", async () => {
+    testData = [
+      {
+        user_id: 1,
+        title: "day one",
+        description: "The plant is growing well.",
+        height: 0,
+        water: 20,
+        light_level: 5000,
+        relative_humidity: 50,
+        temperature: 30,
+        picture: "https://mybucket.s3.amazonaws.com/myfolder/afile.jpg",
+        created: "2024-12-04",
+        time_stamp: "2024-12-04T23:59:60Z",
+      },
+      {
+        user_id: 2,
+        title: "day one",
+        description: "The plant is NOT growing well.",
+        height: 0,
+        water: 4,
+        light_level: 10000,
+        relative_humidity: 90,
+        temperature: 34,
+        picture: "https://mybucket.s3.amazonaws.com/myfolder/afile.jpg",
+        created: "2024-12-04",
+        time_stamp: "2024-12-04T23:59:60Z",
+      },
+    ];
+
+    mockQuery.mockImplementationOnce((sql) => [testData, {}]);
+
+    expect(await getPosts()).toEqual({
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: "Successfully retrieved posts.",
+        body: testData,
+      }),
+    });
+  });
+});
