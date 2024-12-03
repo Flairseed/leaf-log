@@ -157,7 +157,7 @@ async function updatePost(postId, req) {
       postId,
     ];
 
-    const [result, fields] = await connection.query(updateSql, queryValues);
+    await connection.query(updateSql, queryValues);
 
     return response(200, {
       message: "Post successfully updated.",
