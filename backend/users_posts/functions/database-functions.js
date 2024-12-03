@@ -211,7 +211,21 @@ async function deletePost(userId, postId) {
   }
 }
 
-
+async function getPosts() {
+  try {
+    sql = "SELECT * FROM post";
+    const [posts, fields] = await connection.query(sql);
+    return response(200, {
+      message: "Successfully retrieved posts.",
+      body: posts,
+    });
+  } catch {
+    console.log(err);
+    return response(500, {
+      message: "Internal server error.",
+    });
+  }
+}
 module.exports = {
   connectToDatabase,
   userRegister,
@@ -219,4 +233,5 @@ module.exports = {
   createPost,
   updatePost,
   deletePost,
+  getPosts,
 };
