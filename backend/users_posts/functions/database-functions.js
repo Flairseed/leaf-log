@@ -127,7 +127,7 @@ async function updatePost(postId, req) {
     return response(404, {
       message: `Post with id of ${postId} does not exist.`,
     });
-  } else if (posts[0].user_id !== req.userId) {
+  } else if (posts[0].user_id !== +req.userId) {
     return response(403, {
       message: `User with id of ${req.userId} is not allowed to edit post of id ${postId}.`,
     });
@@ -189,7 +189,7 @@ async function deletePost(userId, postId) {
     return response(404, {
       message: `Post with id of ${postId} does not exist.`,
     });
-  } else if (posts[0].user_id !== userId) {
+  } else if (posts[0].user_id !== +userId) {
     return response(403, {
       message: `User with id of ${userId} is not allowed to delete post of id ${postId}.`,
     });
