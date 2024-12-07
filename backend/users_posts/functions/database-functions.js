@@ -1,6 +1,7 @@
 const mysql = require("mysql2/promise");
 const { response, displayErrors } = require("./response-functions");
 const { validateUser } = require("../models/user");
+const { validateCreatePost } = require("../models/createPost");
 require("dotenv").config();
 
 let connection = null;
@@ -25,11 +26,11 @@ async function userRegister(req) {
   }
 
   try {
-    const findSql = "SElECT * FROM user WHERE name = ?"
+    const findSql = "SElECT * FROM user WHERE name = ?";
     const [users, fields] = await connection.query(findSql, [req.name]);
     if (users.length !== 0) {
       return response(403, {
-        message: `User with name ${req.name} is already registered.`
+        message: `User with name ${req.name} is already registered.`,
       });
     }
 
@@ -77,8 +78,160 @@ async function userLogin(req) {
   }
 }
 
+async function createPost(req) {
+  const valid = validateCreatePost(req);
+
+  if (!valid) {
+    return response(400, displayErrors(validateCreatePost.errors));
+  }
+
+  try {
+    const sql =
+      "INSERT INTO post(user_id, title, description, height, water, light_level, relative_humidity, temperature, picture, created) " +
+      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    const queryValues = [
+      req.userId,
+      req.title,
+      req.description,
+      req.height,
+      req.water,
+      req.lightLevel,
+      req.relativeHumidity,
+      req.temperature,
+      req.picture,
+      req.created,
+    ];
+
+    await connection.query(sql, queryValues);
+    return response(200, {
+      message: "Successfully created post.",
+    });
+  } catch (err) {
+    console.log(err);
+    return response(500, {
+      message: "Internal server error.",
+    });
+  }
+}
+
+async function updatePost(postId, req) {
+  if (!Number.isInteger(+postId)) {
+    return response(400, {
+      message: `${postId} is not a valid post id. Post id must be an integer.`,
+    });
+  }
+
+  const selectSql = "SELECT * FROM post WHERE id = ?";
+  const [posts, fields] = await connection.query(selectSql, [postId]);
+  if (posts.length === 0) {
+    return response(404, {
+      message: `Post with id of ${postId} does not exist.`,
+    });
+  } else if (posts[0].user_id !== req.userId) {
+    return response(403, {
+      message: `User with id of ${req.userId} is not allowed to edit post of id ${postId}.`,
+    });
+  }
+
+  const valid = validateCreatePost(req);
+
+  if (!valid) {
+    return response(400, displayErrors(validateCreatePost.errors));
+  }
+
+  try {
+    const updateSql =
+      "UPDATE post SET user_id = ?, title = ?, description = ?, height = ?, water = ?, light_level = ?, " + 
+      "relative_humidity = ?, temperature = ?, picture = ?, created = ? WHERE id = ?";
+    const queryValues = [
+      req.userId,
+      req.title,
+      req.description,
+      req.height,
+      req.water,
+      req.lightLevel,
+      req.relativeHumidity,
+      req.temperature,
+      req.picture,
+      req.created,
+      postId,
+    ];
+
+    await connection.query(updateSql, queryValues);
+
+    return response(200, {
+      message: "Post successfully updated.",
+    });
+  } catch (err) {
+    console.log(err);
+    return response(500, {
+      message: "Internal server error.",
+    });
+  }
+}
+
+async function deletePost(userId, postId) {
+  if (!Number.isInteger(+userId)) {
+    return response(400, {
+      message: `${userId} is not a valid user id. User id must be an integer.`,
+    });
+  }
+
+  if (!Number.isInteger(+postId)) {
+    return response(400, {
+      message: `${postId} is not a valid post id. Post id must be an integer.`,
+    });
+  }
+
+  const selectSql = "SELECT * FROM post WHERE id = ?";
+  const [posts, fields] = await connection.query(selectSql, [postId]);
+  if (posts.length === 0) {
+    return response(404, {
+      message: `Post with id of ${postId} does not exist.`,
+    });
+  } else if (posts[0].user_id !== userId) {
+    return response(403, {
+      message: `User with id of ${userId} is not allowed to delete post of id ${postId}.`,
+    });
+  }
+
+  try {
+    const deleteSql = "DELETE FROM post WHERE id = ?";
+
+    await connection.query(deleteSql, [postId]);
+
+    return response(200, {
+      message: "Post successfully deleted.",
+    });
+  } catch (err) {
+    console.log(err);
+    return response(500, {
+      message: "Internal server error.",
+    });
+  }
+}
+
+async function getPosts() {
+  try {
+    sql = "SELECT * FROM post";
+    const [posts, fields] = await connection.query(sql);
+    return response(200, {
+      message: "Successfully retrieved posts.",
+      body: posts,
+    });
+  } catch {
+    console.log(err);
+    return response(500, {
+      message: "Internal server error.",
+    });
+  }
+}
 module.exports = {
   connectToDatabase,
   userRegister,
   userLogin,
+  createPost,
+  updatePost,
+  deletePost,
+  getPosts,
 };
