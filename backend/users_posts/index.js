@@ -3,10 +3,6 @@ const {
   connectToDatabase,
   userRegister,
   userLogin,
-  createPost,
-  updatePost,
-  deletePost,
-  getPosts,
 } = require("./functions/database-functions");
 
 exports.handler = async (event, context) => {
@@ -26,23 +22,6 @@ exports.handler = async (event, context) => {
     case "POST /users/login":
       body = JSON.parse(event.body);
       res = await userLogin(body);
-      break;
-    case "POST /posts":
-      body = JSON.parse(event.body);
-      res = await createPost(body);
-      break;
-    case "PUT /posts/{id}":
-      id = event.pathParameters.id;
-      body = JSON.parse(event.body);
-      res = await updatePost(id, body);
-      break;
-    case "DELETE /posts/{id}":
-      id = event.pathParameters.id;
-      userId = event.queryStringParameters.userId;
-      res = await deletePost(userId, id);
-      break;
-    case "GET /posts":
-      res = await getPosts();
       break;
     default:
       res = response(404, { message: "Unsupported route: " + event.routeKey });
