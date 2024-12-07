@@ -27,7 +27,7 @@ exports.handler = async (event, context) => {
       body = JSON.parse(event.body);
       res = await userLogin(body);
       break;
-    case "POST/posts":
+    case "POST /posts":
       body = JSON.parse(event.body);
       res = await createPost(body);
       break;
