@@ -40,6 +40,7 @@ fun BookEntry(
     val hasError = error != null
     Box(modifier = modifier,) {
         TextField(
+            modifier = Modifier.fillMaxWidth(),
             value = value,
             isError = hasError,
             onValueChange = onValueChange,

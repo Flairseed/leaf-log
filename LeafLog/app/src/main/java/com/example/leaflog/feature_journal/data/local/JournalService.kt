@@ -10,17 +10,17 @@ import com.example.leaflog.feature_journal.data.model.Journal
 @Dao
 interface JournalService {
     @Query("SELECT * FROM journal")
-    fun getAllJournals(): List<Journal>
+    suspend fun getAllJournals(): List<Journal>
 
     @Query("SELECT * FROM journal WHERE id=:id")
-    fun getJournalById(id: Int): List<Journal>
+    suspend fun getJournalById(id: Int): List<Journal>
 
     @Insert
-    fun createJournal(journal: Journal)
+    suspend fun createJournal(journal: Journal)
 
     @Update
-    fun updateJournal(journal: Journal)
+    suspend fun updateJournal(journal: Journal)
 
     @Delete
-    fun deleteJournal(journal: Journal)
+    suspend fun deleteJournal(journal: Journal)
 }

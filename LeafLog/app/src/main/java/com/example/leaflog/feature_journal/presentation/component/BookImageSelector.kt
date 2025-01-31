@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,6 +47,7 @@ fun BookImageSelector(
     modifier: Modifier = Modifier,
     value: String? = null,
     error: String? = null,
+    isLoading: Boolean = false,
     onSave: (String) -> Unit,
 ) {
     val background = Color(0xFF881A1A)
@@ -77,11 +79,13 @@ fun BookImageSelector(
                 .background(Color.White, RoundedCornerShape(10.dp))
                 .fillMaxSize()
                 .clickable {
-                    if (hasPermission) {
-                        currentFile = context.createImageFile()
-                        cameraLauncher.launch(context.getUriForFile(currentFile!!))
-                    } else {
-                        getPermission.launch(Manifest.permission.CAMERA)
+                    if (!isLoading) {
+                        if (hasPermission) {
+                            currentFile = context.createImageFile()
+                            cameraLauncher.launch(context.getUriForFile(currentFile!!))
+                        } else {
+                            getPermission.launch(Manifest.permission.CAMERA)
+                        }
                     }
                 }
             ) {
@@ -102,6 +106,11 @@ fun BookImageSelector(
                         contentDescription = ""
                     )
                 }
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
             }
         }
         if (hasError) {
@@ -120,7 +129,7 @@ fun BookImageSelector(
 @Composable
 private fun PreviewBookImageSelector() {
     LeafLogTheme {
-        BookImageSelector(Modifier.width(250.dp), error = "ERROR") {
+        BookImageSelector(Modifier.width(250.dp)) {
             
         }
     }
