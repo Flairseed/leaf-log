@@ -6,7 +6,7 @@ import java.util.Date
 
 @Entity
 data class Journal(
-    @PrimaryKey val id: Int,
+    @PrimaryKey(autoGenerate = true) val id: Int,
     val title: String,
     val description: String,
     val picture: String,
