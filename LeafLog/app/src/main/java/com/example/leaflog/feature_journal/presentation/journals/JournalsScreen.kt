@@ -28,13 +28,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.leaflog.core.presentation.component.AppBar
+import com.example.leaflog.feature_journal.data.model.Journal
 import com.example.leaflog.feature_journal.presentation.component.Book
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun JournalScreen(
     viewModel: JournalsViewModel = viewModel(),
-    onJournalClicked: (journalId: Int) -> Unit,
+    onJournalClicked: (journalId: Journal) -> Unit,
     onFABClicked: () -> Unit,
 ) {
     val background = Color(0xFFFFF8F5)
@@ -101,7 +102,7 @@ fun JournalScreen(
                         modifier = Modifier
                             .padding(10.dp)
                             .clickable {
-                                onJournalClicked(book.id)
+                                onJournalClicked(book)
                             }
                         ,
                         title = book.title,
