@@ -6,10 +6,15 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -30,6 +35,8 @@ fun JournalScreen(
     viewModel: JournalsViewModel = viewModel()
 ) {
     val background = Color(0xFFFFF8F5)
+    val secondaryContainer = Color(0xFFB7DBC9)
+    val onSecondaryContainer = Color(0xFF244537)
     val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(key1 = true) {
@@ -54,6 +61,19 @@ fun JournalScreen(
                 onMenuClicked = { /*TODO*/ },
                 onProfileClicked = { /*TODO*/ }
             )
+        },
+        floatingActionButton = {
+            LargeFloatingActionButton(
+                containerColor = secondaryContainer,
+                contentColor = onSecondaryContainer,
+                onClick = { /*TODO*/ }
+            ) {
+                Icon(
+                    modifier = Modifier.size(36.dp),
+                    imageVector = Icons.Default.Add,
+                    contentDescription = ""
+                )
+            }
         },
         containerColor = background
     ) {
