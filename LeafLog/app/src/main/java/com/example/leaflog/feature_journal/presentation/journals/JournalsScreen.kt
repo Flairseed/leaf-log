@@ -1,5 +1,6 @@
 package com.example.leaflog.feature_journal.presentation.journals
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -32,7 +33,9 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun JournalScreen(
-    viewModel: JournalsViewModel = viewModel()
+    viewModel: JournalsViewModel = viewModel(),
+    onJournalClicked: (journalId: Int) -> Unit,
+    onFABClicked: () -> Unit,
 ) {
     val background = Color(0xFFFFF8F5)
     val secondaryContainer = Color(0xFFB7DBC9)
@@ -66,7 +69,7 @@ fun JournalScreen(
             LargeFloatingActionButton(
                 containerColor = secondaryContainer,
                 contentColor = onSecondaryContainer,
-                onClick = { /*TODO*/ }
+                onClick = onFABClicked
             ) {
                 Icon(
                     modifier = Modifier.size(36.dp),
@@ -95,7 +98,12 @@ fun JournalScreen(
             ) {
                 items(state.journals) { book ->
                     Book(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onJournalClicked(book.id)
+                            }
+                        ,
                         title = book.title,
                         description = book.description,
                         image = book.picture

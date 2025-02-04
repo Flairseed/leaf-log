@@ -39,6 +39,9 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun SetJournalScreen(
     postId: Int? = null,
+    goBack: () -> Unit,
+    onPost: () -> Unit,
+    onDelete: (() -> Unit)? = null,
 ) {
     val background = Color(0xFFF77171)
     val error = Color(0xFFBA1A1A)
@@ -58,9 +61,11 @@ fun SetJournalScreen(
                         message = it.message
                     )
                 } is SetJournalViewModel.UiEvent.Posted -> {
-
+                    onPost()
                 } is SetJournalViewModel.UiEvent.Deleted -> {
-
+                    if (onDelete != null) {
+                        onDelete()
+                    }
                 }
             }
         }
@@ -72,7 +77,7 @@ fun SetJournalScreen(
             Box(modifier = Modifier.height(80.dp)) {
                 IconButton(
                     modifier = Modifier.align(Alignment.CenterStart),
-                    onClick = { /*TODO*/ }
+                    onClick = goBack
                 ) {
                     Icon(imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = "")
                 }
@@ -165,13 +170,5 @@ fun SetJournalScreen(
                 }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-private fun PreviewSetJournalScreen() {
-    LeafLogTheme {
-        SetJournalScreen()
     }
 }

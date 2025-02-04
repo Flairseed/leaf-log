@@ -37,9 +37,13 @@ import com.example.leaflog.core.presentation.component.CustomButton
 
 @Composable
 fun JournalDetailsScreen(
+    journalId: Int,
     title: String,
     description: String,
     picture: String,
+    goBack: () -> Unit,
+    onEdit: (Int) -> Unit,
+    goToLogs: () -> Unit,
 ) {
     val background = Color(0xFFF77171)
     val textColor = Color.White
@@ -55,7 +59,7 @@ fun JournalDetailsScreen(
             Box(modifier = Modifier.height(80.dp)) {
                 IconButton(
                     modifier = Modifier.align(Alignment.CenterStart),
-                    onClick = { /*TODO*/ }
+                    onClick = goBack
                 ) {
                     Icon(imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = "")
                 }
@@ -138,7 +142,7 @@ fun JournalDetailsScreen(
                     label = "Edit",
                     leadingIcon = Icons.Default.Create
                 ) {
-                    
+                    onEdit(journalId)
                 }
                 CustomButton(
                     modifier = Modifier.width(150.dp),
@@ -147,7 +151,7 @@ fun JournalDetailsScreen(
                     color = surfaceContainer,
                     foreground = onSurface
                 ) {
-
+                    goToLogs()
                 }
             }
         }
