@@ -41,6 +41,10 @@ class SetJournalViewModel(
     }
 
     fun onSubmit() {
+        if (state.isLoading) {
+            return
+        }
+
         val requiredError = "This field is required"
         var hasErrors = false
 
