@@ -15,7 +15,8 @@ import java.time.Instant
 import java.util.Date
 
 class SetJournalViewModel(
-    private val db: LocalDataBase = Services.localDb
+    private val db: LocalDataBase = Services.localDb,
+    private val postId: Int?,
 ) : ViewModel() {
     var state by mutableStateOf(SetJournalState())
         private set
@@ -23,9 +24,15 @@ class SetJournalViewModel(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    sealed class UiEvent() {
+    sealed class UiEvent {
         data class ShowSnackbar(val message: String) : UiEvent()
         data object Posted: UiEvent()
+    }
+
+    init {
+        if (postId != null) {
+            getData(postId)
+        }
     }
 
     fun onTitleChange(value: String) {
@@ -38,6 +45,31 @@ class SetJournalViewModel(
 
     fun onPictureChange(value: String) {
         state = state.copy(picture = value)
+    }
+
+    private fun getData(id: Int) {
+        if (state.isLoading) {
+            return
+        }
+        viewModelScope.launch {
+            state = state.copy(isLoading = true)
+            try {
+                val journals = db.journalService().getJournalById(id)
+                if (journals.isEmpty()) {
+                    _eventFlow.emit(UiEvent.ShowSnackbar("Post of id $id does not exist"))
+                } else {
+                    state = state.copy(
+                        title = journals[0].title,
+                        description = journals[0].description,
+                        picture = journals[0].picture,
+                    )
+                }
+            } catch (_: Exception) {
+                _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error while loading this post"))
+            } finally {
+                state = state.copy(isLoading = false)
+            }
+        }
     }
 
     fun onSubmit() {
@@ -73,20 +105,22 @@ class SetJournalViewModel(
             viewModelScope.launch {
                 state = state.copy(isLoading = true)
                 try {
-                    db.journalService().createJournal(
-                        Journal(
-                            id = 0,
-                            title = state.title,
-                            description = state.description,
-                            picture = state.picture!!,
-                            created = Date.from(Instant.now())
-                        )
+                    val journal = Journal(
+                        id = postId ?: 0,
+                        title = state.title,
+                        description = state.description,
+                        picture = state.picture!!,
+                        created = Date.from(Instant.now())
                     )
+                    if (postId == null) {
+                        db.journalService().createJournal(journal)
+                    } else {
+                        db.journalService().updateJournal(journal)
+                    }
                     _eventFlow.emit(UiEvent.Posted)
                 } catch (_: Exception) {
                     _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error"))
-                }
-                finally {
+                } finally {
                     state = state.copy(isLoading = false)
                 }
             }

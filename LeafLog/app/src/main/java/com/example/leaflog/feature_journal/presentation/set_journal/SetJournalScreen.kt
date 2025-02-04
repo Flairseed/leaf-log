@@ -34,10 +34,13 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun SetJournalScreen(
-    viewModel: SetJournalViewModel = viewModel()
+    postId: Int? = null,
 ) {
     val background = Color(0xFFF77171)
 
+    val viewModel = viewModel {
+        SetJournalViewModel(postId = postId)
+    }
     val state = viewModel.state
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -67,11 +70,11 @@ fun SetJournalScreen(
                     Icon(imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = "")
                 }
             }
-        }
+        },
+        containerColor = background
     ) {
         Box(
             modifier = Modifier
-                .background(background)
                 .fillMaxSize()
                 .padding(it)
                 .consumeWindowInsets(it)
