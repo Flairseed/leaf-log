@@ -36,61 +36,67 @@ fun Book(
 ) {
     val foreground = 0xFF881A1A
     val text = Color.White
-    Box(modifier = modifier
-        .width(158.dp)
-        .height(202.dp),
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
     ) {
-        Image(
-            modifier = Modifier.matchParentSize(),
-            imageVector = ImageVector.vectorResource(id = R.drawable.journal),
-            contentDescription = "Journal book",
-        )
-        AsyncImage(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 30.dp)
-                .size(70.dp)
-                .background(
-                    Color(foreground),
-                    shape = MaterialTheme.shapes.small,
-                )
-                .padding(5.dp)
-                .clip(shape = MaterialTheme.shapes.small)
-                .background(Color.Black),
-            model = image,
-            contentDescription = null,
-        )
-        Text(
-            modifier = Modifier
-                .padding(top = 106.dp)
-                .background(Color(foreground))
-                .width(155.dp),
-            text = title,
-            color = text,
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Medium,
-            fontSize = 14.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
         Box(
             modifier = Modifier
-                .padding(top = 140.dp)
-                .background(Color(foreground))
-                .width(155.dp)
-                .height(55.dp)
+                .width(158.dp)
+                .height(202.dp),
         ) {
+            Image(
+                modifier = Modifier.matchParentSize(),
+                imageVector = ImageVector.vectorResource(id = R.drawable.journal),
+                contentDescription = "Journal book",
+            )
+            AsyncImage(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 30.dp)
+                    .size(70.dp)
+                    .background(
+                        Color(foreground),
+                        shape = MaterialTheme.shapes.small,
+                    )
+                    .padding(5.dp)
+                    .clip(shape = MaterialTheme.shapes.small)
+                    .background(Color.Black),
+                model = image,
+                contentDescription = null,
+            )
             Text(
                 modifier = Modifier
-                    .padding(5.dp)
-                    .align(Alignment.Center),
-                text = description,
+                    .padding(top = 106.dp)
+                    .background(Color(foreground))
+                    .width(155.dp),
+                text = title,
                 color = text,
                 textAlign = TextAlign.Center,
-                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                fontSize = 14.sp,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                lineHeight = 16.sp
             )
+            Box(
+                modifier = Modifier
+                    .padding(top = 140.dp)
+                    .background(Color(foreground))
+                    .width(155.dp)
+                    .height(55.dp)
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .align(Alignment.Center),
+                    text = description,
+                    color = text,
+                    textAlign = TextAlign.Center,
+                    fontSize = 12.sp,
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 16.sp
+                )
+            }
         }
     }
 }
