@@ -1,8 +1,10 @@
 package com.example.leaflog.feature_journal.presentation.set_journal
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,7 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.outlined.Create
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -37,6 +41,8 @@ fun SetJournalScreen(
     postId: Int? = null,
 ) {
     val background = Color(0xFFF77171)
+    val error = Color(0xFFBA1A1A)
+    val onError = Color(0xFFFFFFFF)
 
     val viewModel = viewModel {
         SetJournalViewModel(postId = postId)
@@ -51,8 +57,9 @@ fun SetJournalScreen(
                     snackBarHostState.showSnackbar(
                         message = it.message
                     )
-                }
-                is SetJournalViewModel.UiEvent.Posted -> {
+                } is SetJournalViewModel.UiEvent.Posted -> {
+
+                } is SetJournalViewModel.UiEvent.Deleted -> {
 
                 }
             }
@@ -114,16 +121,47 @@ fun SetJournalScreen(
                     viewModel.onDescriptionChange(value)
                 }
             }
-            CustomButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 80.dp),
-                label = "Confirm",
-                leadingIcon = Icons.Outlined.Create,
-            ) {
-                if (!state.isLoading) {
-                    viewModel.onSubmit()
+            if (postId == null) {
+                CustomButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 80.dp),
+                    label = "Confirm",
+                    leadingIcon = Icons.Outlined.Create,
+                ) {
+                    if (!state.isLoading) {
+                        viewModel.onSubmit()
+                    }
+                }
+            } else {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 80.dp),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    CustomButton(
+                        modifier = Modifier.width(150.dp),
+                        label = "Confirm",
+                        leadingIcon = Icons.Default.Create
+                    ) {
+                        if (!state.isLoading) {
+                            viewModel.onSubmit()
+                        }
+                    }
+                    CustomButton(
+                        modifier = Modifier.width(150.dp),
+                        label = "Delete",
+                        leadingIcon = Icons.Outlined.Delete,
+                        color = error,
+                        foreground = onError
+                    ) {
+                        if (!state.isLoading) {
+                            viewModel.onDelete()
+                        }
+                    }
                 }
             }
         }

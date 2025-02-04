@@ -24,9 +24,12 @@ class SetJournalViewModel(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
+    private var _currentPost: Journal? = null
+
     sealed class UiEvent {
         data class ShowSnackbar(val message: String) : UiEvent()
         data object Posted: UiEvent()
+        data object Deleted: UiEvent()
     }
 
     init {
@@ -58,6 +61,7 @@ class SetJournalViewModel(
                 if (journals.isEmpty()) {
                     _eventFlow.emit(UiEvent.ShowSnackbar("Post of id $id does not exist"))
                 } else {
+                    _currentPost = journals[0]
                     state = state.copy(
                         title = journals[0].title,
                         description = journals[0].description,
@@ -66,6 +70,27 @@ class SetJournalViewModel(
                 }
             } catch (_: Exception) {
                 _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error while loading this post"))
+            } finally {
+                state = state.copy(isLoading = false)
+            }
+        }
+    }
+
+    fun onDelete() {
+        if (state.isLoading || postId == null) {
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                state = state.copy(isLoading = true)
+
+                db.journalService().deleteJournal(
+                    _currentPost!!
+                )
+                _eventFlow.emit(UiEvent.Deleted)
+            } catch (_: Exception) {
+                _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error while deleting"))
             } finally {
                 state = state.copy(isLoading = false)
             }
