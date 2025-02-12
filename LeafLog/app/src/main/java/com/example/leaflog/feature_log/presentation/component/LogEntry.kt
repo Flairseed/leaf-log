@@ -39,6 +39,7 @@ fun LogEntry(
     value: String,
     fontSize: TextUnit = 16.sp,
     height: Dp = Dp.Unspecified,
+    lineHeight: TextUnit = TextUnit.Unspecified,
     error: String? = null,
     isLoading: Boolean = false,
     multiline: Boolean = false,
@@ -76,12 +77,14 @@ fun LogEntry(
                     enabled = !isLoading,
                     singleLine = !multiline,
                     minLines = if (multiline) 3 else 1,
+                    maxLines = 10,
                     textStyle = LocalTextStyle.current.copy(
                         textAlign = if (multiline) TextAlign.Start else TextAlign.Center,
                         fontSize = fontSize,
                         fontFamily = schoolBellFamily,
                         fontWeight = if (multiline) FontWeight.Normal else FontWeight.Medium,
-                        color = textColor
+                        color = textColor,
+                        lineHeight = lineHeight
                     ),
                 )
                 if (!multiline) {
