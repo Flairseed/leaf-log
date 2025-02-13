@@ -1,5 +1,8 @@
 package com.example.leaflog.feature_log.presentation.set_log
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import androidx.compose.runtime.getValue
@@ -8,18 +11,25 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.leaflog.core.data.local.LocalDataBase
+import com.example.leaflog.core.data.remote.HttpHandler
 import com.example.leaflog.feature_log.data.model.Log
 import com.example.leaflog.util.CustomSensorEventListener
 import com.example.leaflog.util.Services
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import org.json.JSONObject
 import java.util.Date
 import kotlin.math.round
 
 class SetLogViewModel(
     private val db: LocalDataBase = Services.localDb,
+    private val locationClient: FusedLocationProviderClient = Services.fusedLocationProviderClient,
     private val journalId: Int,
     private val logId: Int?
 ) : ViewModel() {
@@ -113,6 +123,42 @@ class SetLogViewModel(
                 state = state.copy(isLoading = false)
             }
 
+        }
+    }
+
+    fun getWeatherData(context: Context) {
+        if (state.isLoading) {
+            return
+        }
+
+        viewModelScope.launch {
+            state = state.copy(isLoading = true)
+            try {
+                if (context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    val location = locationClient.getCurrentLocation(
+                        Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+                        null
+                    ).await()
+                    val weatherResponse = HttpHandler.getData("${HttpHandler.WEATHER_URL}/weather?lat=${location.latitude}&lon=${location.longitude}&units=metric&APPID=071d057f6ceeaed3b5f3cd8bf2d5a651")
+                    if (weatherResponse != null) {
+                        val weatherJson = JSONObject(weatherResponse)
+                        state = state.copy(
+                            temperature = round((weatherJson["main"] as JSONObject)["temp"] as Double).toInt()
+                        )
+                        state = state.copy(
+                            relativeHumidity = (weatherJson["main"] as JSONObject)["humidity"] as Int
+                        )
+                    } else {
+                        _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error while communicating with the server"))
+                    }
+                } else {
+                    _eventFlow.emit(UiEvent.ShowSnackbar("Please allow this app to access your location"))
+                }
+            } catch (_: Exception) {
+                _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error while getting weather data"))
+            } finally {
+                state = state.copy(isLoading = false)
+            }
         }
     }
 

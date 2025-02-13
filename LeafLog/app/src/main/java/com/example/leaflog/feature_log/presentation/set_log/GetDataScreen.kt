@@ -1,9 +1,13 @@
 package com.example.leaflog.feature_log.presentation.set_log
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -22,6 +26,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,6 +39,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.leaflog.core.presentation.component.CustomButton
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.leaflog.util.Services
+import com.google.android.gms.location.FusedLocationProviderClient
 
 @Composable
 fun GetDataScreen(
@@ -43,9 +53,16 @@ fun GetDataScreen(
 
     val state = viewModel.state
 
-    val sensorManager = LocalContext.current.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    val context = LocalContext.current
+    val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     val lightLevelSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
-
+    var hasPermission by remember { mutableStateOf(context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) }
+    val getPermission = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) {
+        hasPermission = it
+    }
+    
     Scaffold(
         topBar = {
             Box(
@@ -100,7 +117,11 @@ fun GetDataScreen(
                 color = buttonOneColor
             ) {
                 if (!state.isLoading) {
-
+                    if (hasPermission) {
+                        viewModel.getWeatherData(context)
+                    } else {
+                        getPermission.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                    }
                 }
             }
             Text(
