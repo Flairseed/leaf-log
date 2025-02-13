@@ -36,7 +36,7 @@ fun LogSimple(
     title: String,
     picture: String,
     created: Date,
-    author: String
+    author: String? = null
     ) {
     Box(
         modifier = modifier,
@@ -92,16 +92,18 @@ fun LogSimple(
                 )
             }
 
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 18.dp, start = 28.dp),
-                text = "By: $author",
-                fontSize = 10.sp,
-                fontFamily = schoolBellFamily,
-                textAlign = TextAlign.Start
-            )
+            if (author != null) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 18.dp, start = 28.dp),
+                    text = "By: $author",
+                    fontSize = 10.sp,
+                    fontFamily = schoolBellFamily,
+                    textAlign = TextAlign.Start
+                )
+            }
         }
     }
 }
