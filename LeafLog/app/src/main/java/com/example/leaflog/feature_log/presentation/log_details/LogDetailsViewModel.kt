@@ -23,6 +23,7 @@ class LogDetailsViewModel(
 
     sealed class UiEvent() {
         data class ShowSnackbar(val message: String) : UiEvent()
+        data object Deleted: UiEvent()
     }
 
     init {
@@ -42,6 +43,27 @@ class LogDetailsViewModel(
                 )
             } catch (_: Exception) {
                 _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error while loading the log"))
+            } finally {
+                state = state.copy(isLoading = false)
+            }
+        }
+    }
+
+    fun onDelete() {
+        if (state.isLoading || state.log == null) {
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                state = state.copy(isLoading = true)
+
+                db.logService().deleteLog(
+                    state.log!!
+                )
+                _eventFlow.emit(UiEvent.Deleted)
+            } catch (_: Exception) {
+                _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error while deleting"))
             } finally {
                 state = state.copy(isLoading = false)
             }

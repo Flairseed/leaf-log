@@ -4,8 +4,10 @@ import android.text.format.DateFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +19,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
@@ -37,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import com.example.leaflog.core.presentation.component.CustomButton
 import com.example.leaflog.feature_log.presentation.component.LogPage
 import com.example.leaflog.ui.theme.schoolBellFamily
 import kotlinx.coroutines.flow.collectLatest
@@ -44,9 +49,13 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun LogDetailsScreen(
     logId: Int,
-    goBack: () -> Unit
+    goBack: () -> Unit,
+    onDelete: () -> Unit,
+    goToUpdateScreen: (Int) -> Unit
 ) {
     val surface = Color(0xFFFFF8F5)
+    val error = Color(0xFFBA1A1A)
+    val onError = Color(0xFFFFFFFF)
 
     val columnScroll = rememberScrollState()
     val titleScroll = rememberScrollState()
@@ -67,6 +76,9 @@ fun LogDetailsScreen(
                         message = it.message
                     )
                 }
+                is LogDetailsViewModel.UiEvent.Deleted -> {
+                    onDelete()
+                }
             }
         }
     }
@@ -80,6 +92,34 @@ fun LogDetailsScreen(
                     onClick = goBack
                 ) {
                     Icon(imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = "")
+                }
+            }
+        },
+        floatingActionButton = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                CustomButton(
+                    modifier = Modifier.width(150.dp),
+                    label = "Edit",
+                    leadingIcon = Icons.Default.Create
+                ) {
+                    if (!state.isLoading) {
+                        goToUpdateScreen(logId)
+                    }
+                }
+                CustomButton(
+                    modifier = Modifier.width(150.dp),
+                    label = "Delete",
+                    leadingIcon = Icons.Outlined.Delete,
+                    color = error,
+                    foreground = onError
+                ) {
+                    if (!state.isLoading) {
+                        viewModel.onDelete()
+                    }
                 }
             }
         },

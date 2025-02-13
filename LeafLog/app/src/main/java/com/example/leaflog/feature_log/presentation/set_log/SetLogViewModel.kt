@@ -44,7 +44,6 @@ class SetLogViewModel(
     sealed class UiEvent {
         data class ShowSnackbar(val message: String) : UiEvent()
         data object Posted: UiEvent()
-        data object Deleted: UiEvent()
     }
 
     init {
@@ -171,7 +170,7 @@ class SetLogViewModel(
                         description = logs[0].description,
                         picture = logs[0].picture,
                         height = logs[0].height.toString(),
-                        water = logs[0].height.toString(),
+                        water = logs[0].water.toString(),
                         lightLevel = logs[0].lightLevel,
                         relativeHumidity = logs[0].relativeHumidity,
                         temperature = logs[0].temperature

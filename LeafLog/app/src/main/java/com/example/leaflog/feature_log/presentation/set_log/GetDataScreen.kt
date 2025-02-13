@@ -74,7 +74,6 @@ fun GetDataScreen(
                     )
                 }
                 is SetLogViewModel.UiEvent.Posted -> {}
-                is SetLogViewModel.UiEvent.Deleted -> {}
             }
         }
     }

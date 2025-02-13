@@ -114,9 +114,8 @@ fun Navigation() {
                     navController.navigate(Routes.GetData.name)
                 },
                 onPost = {
-                    navController.navigate("${Routes.Logs.name}/$journalId")
-                },
-                onDelete = {
+                    navController.popBackStack()
+                    navController.popBackStack()
                     navController.navigate("${Routes.Logs.name}/$journalId")
                 },
                 goBack = {
@@ -149,21 +148,63 @@ fun Navigation() {
                     navController.popBackStack()
                 },
                 onJournalClicked = { log ->
-                    navController.navigate("${Routes.LogDetails.name}/${log.id}")
+                    navController.navigate("${Routes.LogDetails.name}/$journalId/${log.id}")
                 },
                 onFABClicked = {
                     navController.navigate("${Routes.PostLog.name}/$journalId")
                 }
             )
         }
-
         composable(
-            route = "${Routes.LogDetails.name}/{logId}",
-            arguments = listOf(navArgument("logId"){ type = NavType.IntType })
+            route = "${Routes.LogDetails.name}/{journalId}/{logId}",
+            arguments = listOf(
+                navArgument("journalId"){ type = NavType.IntType },
+                navArgument("logId"){ type = NavType.IntType }
+            )
         ) {
+            val journalId = it.arguments?.getInt("journalId") ?: 0
             val logId = it.arguments?.getInt("logId") ?: 0
             LogDetailsScreen(
                 logId = logId,
+                goBack = {
+                    navController.popBackStack()
+                },
+                onDelete = {
+                    navController.popBackStack()
+                    navController.popBackStack()
+                    navController.navigate("${Routes.Logs.name}/$journalId")
+                },
+                goToUpdateScreen = {
+                    navController.navigate("${Routes.UpdateLog.name}/$journalId/$logId")
+                }
+            )
+        }
+        composable(
+            route = "${Routes.UpdateLog.name}/{journalId}/{logId}",
+            arguments = listOf(
+                navArgument("journalId") { type = NavType.IntType },
+                navArgument("logId") { type = NavType.IntType }
+            )
+        ) {
+            val journalId = it.arguments?.getInt("journalId") ?: 0
+            val logId = it.arguments?.getInt("logId") ?: 0
+            val viewModel = viewModel(it) {
+                SetLogViewModel(
+                    journalId = journalId,
+                    logId = logId
+                )
+            }
+            SetLogScreen(
+                viewModel = viewModel,
+                onGetData = {
+                    navController.navigate(Routes.GetData.name)
+                },
+                onPost = {
+                    navController.popBackStack()
+                    navController.popBackStack()
+                    navController.popBackStack()
+                    navController.navigate("${Routes.Logs.name}/$journalId")
+                },
                 goBack = {
                     navController.popBackStack()
                 }
@@ -180,7 +221,8 @@ enum class Routes {
     PostLog,
     GetData,
     Logs,
-    LogDetails
+    LogDetails,
+    UpdateLog
 }
 
 fun NavController.navigateWithPopUpTo(route: String, restore: Boolean = false) {

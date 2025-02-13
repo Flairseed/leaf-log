@@ -49,7 +49,6 @@ fun SetLogScreen(
     viewModel: SetLogViewModel,
     onGetData: () -> Unit,
     onPost: () -> Unit,
-    onDelete: (() -> Unit)? = null,
     goBack: () -> Unit
 ) {
     val surface = Color(0xFFFFF8F5)
@@ -71,10 +70,6 @@ fun SetLogScreen(
                     )
                 } is SetLogViewModel.UiEvent.Posted -> {
                     onPost()
-                } is SetLogViewModel.UiEvent.Deleted -> {
-                    if (onDelete != null) {
-                        onDelete()
-                    }
                 }
             }
         }
