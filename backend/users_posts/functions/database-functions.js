@@ -222,7 +222,7 @@ async function deletePost(userId, postId) {
 
 async function getPosts() {
   try {
-    sql = "SELECT * FROM post";
+    sql = "SELECT post.*, user.name FROM post JOIN user ON user.id = post.user_id;";
     const [posts, fields] = await connection.query(sql);
     return response(200, {
       message: "Successfully retrieved posts.",
