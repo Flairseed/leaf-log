@@ -14,6 +14,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         Services.initLocalDb(this)
+        Services.initFusedLocationProvideClient(this)
 
         setContent {
             LeafLogTheme {
