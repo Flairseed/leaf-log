@@ -40,9 +40,12 @@ async function userRegister(req) {
     const sql = "INSERT INTO user(name, password) VALUES(?, ?)";
     const queryValues = [req.name, req.password];
 
-    await connection.query(sql, queryValues);
+    const [results] = await connection.query(sql, queryValues);
     return response(200, {
       message: "Successfully registered.",
+      body: {
+        id: results.insertId
+      }
     });
   } catch (err) {
     console.log(err);
@@ -71,6 +74,9 @@ async function userLogin(req) {
     } else {
       return response(200, {
         message: "Successfully logged in.",
+        body: {
+          id: users[0].id
+        }
       });
     }
   } catch (err) {
