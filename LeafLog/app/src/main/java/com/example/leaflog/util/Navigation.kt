@@ -1,6 +1,8 @@
 package com.example.leaflog.util
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -15,6 +17,7 @@ import com.example.leaflog.feature_log.presentation.log_details.LogDetailsScreen
 import com.example.leaflog.feature_log.presentation.logs.LogsScreen
 import com.example.leaflog.feature_log.presentation.set_log.GetDataScreen
 import com.example.leaflog.feature_log.presentation.set_log.SetLogScreen
+import com.example.leaflog.feature_log.presentation.set_log.SetLogViewModel
 import java.net.URLDecoder
 import java.net.URLEncoder
 
@@ -99,8 +102,14 @@ fun Navigation() {
             )
         ) {
             val journalId = it.arguments?.getInt("journalId") ?: 0
+            val viewModel = viewModel(it) {
+                SetLogViewModel(
+                    journalId = journalId,
+                    logId = null
+                )
+            }
             SetLogScreen(
-                journalId = journalId,
+                viewModel = viewModel,
                 onGetData = {
                     navController.navigate(Routes.GetData.name)
                 },
@@ -118,7 +127,12 @@ fun Navigation() {
         composable(
             route = Routes.GetData.name
         ) {
+            val parent = remember {
+                navController.previousBackStackEntry!!
+            }
+            val viewModel: SetLogViewModel = viewModel(parent)
             GetDataScreen(
+                viewModel = viewModel,
                 goBack = {
                     navController.popBackStack()
                 }

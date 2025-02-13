@@ -44,7 +44,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 
 @Composable
 fun GetDataScreen(
-    viewModel: SetLogViewModel = viewModel(LocalContext.current as ComponentActivity),
+    viewModel: SetLogViewModel,
     goBack: () -> Unit
 ) {
     val surface = Color(0xFFFFF8F5)

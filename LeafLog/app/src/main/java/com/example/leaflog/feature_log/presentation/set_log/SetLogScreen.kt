@@ -46,8 +46,7 @@ import java.util.Date
 
 @Composable
 fun SetLogScreen(
-    journalId: Int,
-    logId: Int? = null,
+    viewModel: SetLogViewModel,
     onGetData: () -> Unit,
     onPost: () -> Unit,
     onDelete: (() -> Unit)? = null,
@@ -59,15 +58,6 @@ fun SetLogScreen(
     val buttonForeground = Color(0xFF000000)
 
     val columnScroll = rememberScrollState()
-
-    val viewModel = viewModel(
-        LocalContext.current as ComponentActivity
-    ) {
-        SetLogViewModel(
-            journalId = journalId,
-            logId = logId
-        )
-    }
 
     val state = viewModel.state
     val snackBarHostState = remember { SnackbarHostState() }
