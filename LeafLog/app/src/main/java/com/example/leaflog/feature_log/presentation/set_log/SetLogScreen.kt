@@ -49,6 +49,9 @@ fun SetLogScreen(
     journalId: Int,
     logId: Int? = null,
     onGetData: () -> Unit,
+    onPost: () -> Unit,
+    onDelete: (() -> Unit)? = null,
+    goBack: () -> Unit
 ) {
     val surface = Color(0xFFFFF8F5)
     val buttonBorder = Color(0xFFACBDA8)
@@ -77,9 +80,11 @@ fun SetLogScreen(
                         message = it.message
                     )
                 } is SetLogViewModel.UiEvent.Posted -> {
-
+                    onPost()
                 } is SetLogViewModel.UiEvent.Deleted -> {
-
+                    if (onDelete != null) {
+                        onDelete()
+                    }
                 }
             }
         }
@@ -91,7 +96,7 @@ fun SetLogScreen(
             Box(modifier = Modifier.height(80.dp)) {
                 IconButton(
                     modifier = Modifier.align(Alignment.CenterStart),
-                    onClick = {}
+                    onClick = goBack
                 ) {
                     Icon(imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = "")
                 }

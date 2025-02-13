@@ -43,7 +43,7 @@ fun JournalDetailsScreen(
     picture: String,
     goBack: () -> Unit,
     onEdit: (Int) -> Unit,
-    goToLogs: () -> Unit,
+    goToLogs: (Int) -> Unit,
 ) {
     val background = Color(0xFFF77171)
     val textColor = Color.White
@@ -151,7 +151,7 @@ fun JournalDetailsScreen(
                     color = surfaceContainer,
                     foreground = onSurface
                 ) {
-                    goToLogs()
+                    goToLogs(journalId)
                 }
             }
         }

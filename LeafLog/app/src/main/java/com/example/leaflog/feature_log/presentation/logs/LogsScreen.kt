@@ -33,12 +33,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.leaflog.feature_log.data.model.Log
 import com.example.leaflog.feature_log.presentation.component.LogSimple
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LogsScreen(
-    journalId: Int
+    journalId: Int,
+    goBack: () -> Unit,
+    onJournalClicked: (log: Log) -> Unit,
+    onFABClicked: () -> Unit,
 ) {
     val background = Color(0xFFFFF8F5)
     val secondaryContainer = Color(0xFFB7DBC9)
@@ -74,7 +78,7 @@ fun LogsScreen(
             ) {
                 IconButton(
                     modifier = Modifier.align(Alignment.CenterStart),
-                    onClick = {}
+                    onClick = goBack
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.ArrowBack,
@@ -94,7 +98,7 @@ fun LogsScreen(
             LargeFloatingActionButton(
                 containerColor = secondaryContainer,
                 contentColor = onSecondaryContainer,
-                onClick = {}
+                onClick = onFABClicked
             ) {
                 Icon(
                     modifier = Modifier.size(36.dp),
@@ -126,7 +130,7 @@ fun LogsScreen(
                         modifier = Modifier
                             .padding(10.dp)
                             .clickable {
-
+                                onJournalClicked(log)
                             }
                         ,
                         title = log.title,

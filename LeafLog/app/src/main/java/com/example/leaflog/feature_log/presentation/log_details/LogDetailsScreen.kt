@@ -43,7 +43,8 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LogDetailsScreen(
-    logId: Int
+    logId: Int,
+    goBack: () -> Unit
 ) {
     val surface = Color(0xFFFFF8F5)
 
@@ -76,7 +77,7 @@ fun LogDetailsScreen(
             Box(modifier = Modifier.height(80.dp)) {
                 IconButton(
                     modifier = Modifier.align(Alignment.CenterStart),
-                    onClick = {}
+                    onClick = goBack
                 ) {
                     Icon(imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = "")
                 }

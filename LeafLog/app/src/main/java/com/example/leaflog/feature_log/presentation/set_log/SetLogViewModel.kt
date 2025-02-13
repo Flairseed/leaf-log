@@ -266,6 +266,7 @@ class SetLogViewModel(
                     } else {
                         db.logService().updateLog(log)
                     }
+                    _eventFlow.emit(UiEvent.Posted)
                 } catch (_: Exception) {
                     _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error"))
                 } finally {

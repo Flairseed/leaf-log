@@ -11,6 +11,10 @@ import androidx.navigation.navArgument
 import com.example.leaflog.feature_journal.presentation.journal_details.JournalDetailsScreen
 import com.example.leaflog.feature_journal.presentation.journals.JournalScreen
 import com.example.leaflog.feature_journal.presentation.set_journal.SetJournalScreen
+import com.example.leaflog.feature_log.presentation.log_details.LogDetailsScreen
+import com.example.leaflog.feature_log.presentation.logs.LogsScreen
+import com.example.leaflog.feature_log.presentation.set_log.GetDataScreen
+import com.example.leaflog.feature_log.presentation.set_log.SetLogScreen
 import java.net.URLDecoder
 import java.net.URLEncoder
 
@@ -56,8 +60,8 @@ fun Navigation() {
                 onEdit = { id ->
                     navController.navigate("${Routes.UpdateJournal.name}/$id")
                 },
-                goToLogs = {
-
+                goToLogs = { journalId ->
+                    navController.navigate("${Routes.Logs.name}/$journalId")
                 }
             )
         }
@@ -88,6 +92,69 @@ fun Navigation() {
                 }
             )
         }
+        composable(
+            route = "${Routes.PostLog.name}/{journalId}",
+            arguments = listOf(
+                navArgument("journalId") { type = NavType.IntType },
+            )
+        ) {
+            val journalId = it.arguments?.getInt("journalId") ?: 0
+            SetLogScreen(
+                journalId = journalId,
+                onGetData = {
+                    navController.navigate(Routes.GetData.name)
+                },
+                onPost = {
+                    navController.navigate("${Routes.Logs.name}/$journalId")
+                },
+                onDelete = {
+                    navController.navigate("${Routes.Logs.name}/$journalId")
+                },
+                goBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable(
+            route = Routes.GetData.name
+        ) {
+            GetDataScreen(
+                goBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable(
+            route = "${Routes.Logs.name}/{journalId}",
+            arguments = listOf(navArgument("journalId"){ type = NavType.IntType })
+        ) {
+            val journalId = it.arguments?.getInt("journalId") ?: 0
+            LogsScreen(
+                journalId = journalId,
+                goBack = {
+                    navController.popBackStack()
+                },
+                onJournalClicked = { log ->
+                    navController.navigate("${Routes.LogDetails.name}/${log.id}")
+                },
+                onFABClicked = {
+                    navController.navigate("${Routes.PostLog.name}/$journalId")
+                }
+            )
+        }
+
+        composable(
+            route = "${Routes.LogDetails.name}/{logId}",
+            arguments = listOf(navArgument("logId"){ type = NavType.IntType })
+        ) {
+            val logId = it.arguments?.getInt("logId") ?: 0
+            LogDetailsScreen(
+                logId = logId,
+                goBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
     }
 }
 
@@ -95,7 +162,11 @@ enum class Routes {
     Journals,
     JournalDetails,
     PostJournal,
-    UpdateJournal
+    UpdateJournal,
+    PostLog,
+    GetData,
+    Logs,
+    LogDetails
 }
 
 fun NavController.navigateWithPopUpTo(route: String, restore: Boolean = false) {
