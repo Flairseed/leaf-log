@@ -17,7 +17,7 @@ import com.example.leaflog.util.CustomSensorEventListener
 import com.example.leaflog.util.Services
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority
-import com.google.android.gms.tasks.CancellationTokenSource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -81,14 +81,6 @@ class SetLogViewModel(
         state = state.copy(lightLevel = value)
     }
 
-    fun onRelativeHumidityChange(value: Int) {
-        state = state.copy(relativeHumidity = value)
-    }
-
-    fun onTemperatureChange(value: Int) {
-        state = state.copy(temperature = value)
-    }
-
     fun getLightData(
         sensorManager: SensorManager,
         sensor: Sensor?
@@ -131,7 +123,7 @@ class SetLogViewModel(
             return
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             state = state.copy(isLoading = true)
             try {
                 if (context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {

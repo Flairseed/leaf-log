@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorManager
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
@@ -24,8 +23,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,9 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.leaflog.core.presentation.component.CustomButton
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.leaflog.util.Services
-import com.google.android.gms.location.FusedLocationProviderClient
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun GetDataScreen(
@@ -62,8 +62,25 @@ fun GetDataScreen(
     ) {
         hasPermission = it
     }
+
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(key1 = true) {
+        viewModel.eventFlow.collectLatest {
+            when(it) {
+                is SetLogViewModel.UiEvent.ShowSnackbar -> {
+                    snackBarHostState.showSnackbar(
+                        message = it.message
+                    )
+                }
+                is SetLogViewModel.UiEvent.Posted -> {}
+                is SetLogViewModel.UiEvent.Deleted -> {}
+            }
+        }
+    }
     
     Scaffold(
+        snackbarHost = { SnackbarHost(snackBarHostState)},
         topBar = {
             Box(
                 modifier = Modifier
