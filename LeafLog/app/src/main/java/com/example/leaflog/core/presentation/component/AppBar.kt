@@ -24,7 +24,6 @@ import com.example.leaflog.ui.theme.LeafLogTheme
 fun AppBar(
     modifier: Modifier = Modifier,
     label: String,
-    onMenuClicked: () -> Unit,
     onProfileClicked: () -> Unit,
 ) {
     val background = Color(0xFF2E5B00)
@@ -39,10 +38,10 @@ fun AppBar(
     ) {
         IconButton(
             modifier = Modifier.align(Alignment.CenterStart),
-            onClick = onMenuClicked
+            onClick = onProfileClicked
         ) {
             Icon(
-                imageVector = Icons.Default.Menu,
+                imageVector = Icons.Outlined.AccountCircle,
                 contentDescription = "",
                 tint = foreground
             )
@@ -52,16 +51,6 @@ fun AppBar(
             fontSize = MaterialTheme.typography.titleLarge.fontSize,
             color = foreground
         )
-        IconButton(
-            modifier = Modifier.align(Alignment.CenterEnd),
-            onClick = onProfileClicked
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.AccountCircle,
-                contentDescription = "",
-                tint = foreground
-            )
-        }
     }
 }
 
@@ -71,7 +60,6 @@ private fun PreviewAppBar() {
     LeafLogTheme {
         AppBar(
             label = "Journals",
-            onMenuClicked = {},
             onProfileClicked = {}
         )
     }

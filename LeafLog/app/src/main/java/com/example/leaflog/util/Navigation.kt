@@ -79,6 +79,10 @@ fun Navigation() {
                 },
                 onFABClicked = {
                     navController.navigate(Routes.PostJournal.name)
+                },
+                goToLoginScreen = {
+                    startDest = Routes.Login.name
+                    navController.navigateWithPopUpTo(Routes.Login.name)
                 }
             )
         }
