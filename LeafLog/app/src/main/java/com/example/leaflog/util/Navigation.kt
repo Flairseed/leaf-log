@@ -13,11 +13,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.leaflog.feature_online_post.presentation.posts.PostsScreen
+import com.example.leaflog.core.presentation.home.HomeScreen
 import com.example.leaflog.feature_authentication.presentation.login.LoginScreen
 import com.example.leaflog.feature_authentication.presentation.register.RegisterScreen
 import com.example.leaflog.feature_journal.presentation.journal_details.JournalDetailsScreen
-import com.example.leaflog.feature_journal.presentation.journals.JournalScreen
 import com.example.leaflog.feature_journal.presentation.set_journal.SetJournalScreen
 import com.example.leaflog.feature_log.presentation.log_details.LogDetailsScreen
 import com.example.leaflog.feature_log.presentation.logs.LogsScreen
@@ -49,8 +48,8 @@ fun Navigation() {
                     navController.navigateWithPopUpTo(Routes.Register.name, true)
                 },
                 goToHomeScreen = {
-                    startDest = Routes.Journals.name
-                    navController.navigateWithPopUpTo(Routes.Journals.name)
+                    startDest = Routes.Home.name
+                    navController.navigateWithPopUpTo(Routes.Home.name)
                 }
             )
         }
@@ -64,20 +63,29 @@ fun Navigation() {
                     navController.navigateWithPopUpTo(Routes.Login.name, true)
                 },
                 goToHomeScreen = {
-                    startDest = Routes.Journals.name
-                    navController.navigateWithPopUpTo(Routes.Journals.name)
+                    startDest = Routes.Home.name
+                    navController.navigateWithPopUpTo(Routes.Home.name)
                 }
             )
         }
 
-        composable(route = Routes.Journals.name) {
-            JournalScreen(
+        composable(route = Routes.Home.name) {
+            HomeScreen(
                 onJournalClicked = {
                     val title = URLEncoder.encode(it.title, "utf-8")
                     val description = URLEncoder.encode(it.description, "utf-8")
                     val picture = URLEncoder.encode(it.picture, "utf-8")
                     navController
                         .navigate("${Routes.JournalDetails.name}/${it.id}/${title}/${description}/${picture}")
+                },
+                onPostClicked = {
+                    val encodedTitle = URLEncoder.encode(it.title, "utf-8")
+                    val encodedDescription = URLEncoder.encode(it.description, "utf-8")
+                    val encodedPicture = URLEncoder.encode(it.picture, "utf-8")
+
+                    navController.navigate(
+                        "${Routes.PostDetails.name}/$encodedTitle/$encodedDescription/$encodedPicture/${it.height}/${it.water}/${it.temperature}/${it.relativeHumidity}/${it.lightLevel}/${it.created.time}"
+                    )
                 },
                 onFABClicked = {
                     navController.navigate(Routes.PostJournal.name)
@@ -119,7 +127,7 @@ fun Navigation() {
                     navController.popBackStack()
                 },
                 onPost = {
-                    navController.navigateWithPopUpTo(Routes.Journals.name)
+                    navController.navigateWithPopUpTo(Routes.Home.name)
                 }
             )
         }
@@ -133,10 +141,10 @@ fun Navigation() {
                     navController.popBackStack()
                 },
                 onPost = {
-                    navController.navigateWithPopUpTo(Routes.Journals.name)
+                    navController.navigateWithPopUpTo(Routes.Home.name)
                 },
                 onDelete = {
-                    navController.navigateWithPopUpTo(Routes.Journals.name)
+                    navController.navigateWithPopUpTo(Routes.Home.name)
                 }
             )
         }
@@ -256,22 +264,6 @@ fun Navigation() {
             )
         }
         composable(
-            route = Routes.Posts.name
-        ) {
-            PostsScreen(
-                goToLoginScreen = { },
-                onPostClicked = {
-                    val encodedTitle = URLEncoder.encode(it.title, "utf-8")
-                    val encodedDescription = URLEncoder.encode(it.description, "utf-8")
-                    val encodedPicture = URLEncoder.encode(it.picture, "utf-8")
-
-                    navController.navigate(
-                        "${Routes.PostDetails.name}/$encodedTitle/$encodedDescription/$encodedPicture/${it.height}/${it.water}/${it.temperature}/${it.relativeHumidity}/${it.lightLevel}/${it.created.time}"
-                    )
-                }
-            )
-        }
-        composable(
             route = "${Routes.PostDetails.name}/{title}/{description}/{picture}/{height}/{water}/{temperature}/{relativeHumidity}/{lightLevel}/{created}",
             arguments = listOf(
                 navArgument("title") { type = NavType.StringType },
@@ -316,7 +308,7 @@ fun Navigation() {
 enum class Routes {
     Login,
     Register,
-    Journals,
+    Home,
     JournalDetails,
     PostJournal,
     UpdateJournal,
@@ -325,7 +317,6 @@ enum class Routes {
     Logs,
     LogDetails,
     UpdateLog,
-    Posts,
     PostDetails
 }
 
