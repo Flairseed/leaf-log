@@ -27,5 +27,23 @@ object AuthService {
         }
     }
 
-
+    fun register(name: String, password: String): String? {
+        val payload = JSONObject()
+        payload.put("name", name)
+        payload.put("password", password)
+        val response = HttpHandler.setData("${HttpHandler.BACKEND_URL}/users/register", payload)
+        return when (response) {
+            null -> {
+                "Internal server error"
+            }
+            HttpHandler.FORBIDDEN -> {
+                "User with that name is already registered"
+            }
+            else -> {
+                userId = (JSONObject(response)["body"] as JSONObject)["id"] as Int
+                userName = name
+                null
+            }
+        }
+    }
 }
