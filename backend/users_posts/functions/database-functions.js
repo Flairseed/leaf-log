@@ -111,9 +111,12 @@ async function createPost(req) {
       req.created,
     ];
 
-    await connection.query(sql, queryValues);
+    const [results] = await connection.query(sql, queryValues);
     return response(200, {
       message: "Successfully created post.",
+      body: {
+        id: results.insertId
+      }
     });
   } catch (err) {
     console.log(err);
