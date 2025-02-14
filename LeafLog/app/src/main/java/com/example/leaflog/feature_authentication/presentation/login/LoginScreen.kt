@@ -35,7 +35,9 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = viewModel()
+    viewModel: LoginViewModel = viewModel(),
+    goToRegisterScreen: () -> Unit,
+    goToHomeScreen: () -> Unit
 ) {
     val background = Color(0xFFFFF8F5)
     val primary = Color(0xFF2E5B00)
@@ -54,9 +56,7 @@ fun LoginScreen(
                         message = it.message
                     )
                 } is LoginViewModel.UiEvent.LoggedIn -> {
-                    snackBarHostState.showSnackbar(
-                        message = "Logged In"
-                    )
+                    goToHomeScreen()
                 }
             }
         }
@@ -137,7 +137,7 @@ fun LoginScreen(
                     }
                 }
                 TextButton(
-                    onClick = { /*TODO*/ }
+                    onClick = goToRegisterScreen
                 ) {
                    Text(
                        text = "No Account? Register",
@@ -145,9 +145,7 @@ fun LoginScreen(
                    )
                 }
                 TextButton(
-                    onClick = {
-
-                    }
+                    onClick = goToHomeScreen
                 ) {
                     Text(
                         text = "Offline Mode",

@@ -35,7 +35,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun RegisterScreen(
-    viewModel: RegisterViewModel = viewModel()
+    viewModel: RegisterViewModel = viewModel(),
+    goToLoginScreen: () -> Unit,
+    goToHomeScreen: () -> Unit
 ) {
     val background = Color(0xFFFFF8F5)
     val primary = Color(0xFF2E5B00)
@@ -54,10 +56,8 @@ fun RegisterScreen(
                         message = it.message
                     )
                 } is RegisterViewModel.UiEvent.Registered -> {
-                snackBarHostState.showSnackbar(
-                    message = "Registered"
-                )
-            }
+                    goToHomeScreen()
+                }
             }
         }
     }
@@ -152,7 +152,7 @@ fun RegisterScreen(
                     }
                 }
                 TextButton(
-                    onClick = { /*TODO*/ }
+                    onClick = goToLoginScreen
                 ) {
                     Text(
                         text = "Already Registered? Login",
@@ -160,9 +160,7 @@ fun RegisterScreen(
                     )
                 }
                 TextButton(
-                    onClick = {
-
-                    }
+                    onClick = goToHomeScreen
                 ) {
                     Text(
                         text = "Offline Mode",

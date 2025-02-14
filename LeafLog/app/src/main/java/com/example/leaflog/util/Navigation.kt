@@ -1,7 +1,10 @@
 package com.example.leaflog.util
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -10,6 +13,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.leaflog.feature_authentication.presentation.login.LoginScreen
+import com.example.leaflog.feature_authentication.presentation.register.RegisterScreen
 import com.example.leaflog.feature_journal.presentation.journal_details.JournalDetailsScreen
 import com.example.leaflog.feature_journal.presentation.journals.JournalScreen
 import com.example.leaflog.feature_journal.presentation.set_journal.SetJournalScreen
@@ -24,11 +29,45 @@ import java.net.URLEncoder
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
+
+    var startDest by remember {
+        mutableStateOf(Routes.Login.name)
+    }
     
     NavHost(
         navController = navController,
-        startDestination = Routes.Journals.name,
+        startDestination = startDest,
     ) {
+        composable(
+            route = Routes.Login.name
+        ) {
+            LoginScreen(
+                goToRegisterScreen = {
+                    startDest = Routes.Register.name
+                    navController.navigateWithPopUpTo(Routes.Register.name, true)
+                },
+                goToHomeScreen = {
+                    startDest = Routes.Journals.name
+                    navController.navigateWithPopUpTo(Routes.Journals.name)
+                }
+            )
+        }
+
+        composable(
+            route = Routes.Register.name
+        ) {
+            RegisterScreen(
+                goToLoginScreen = {
+                    startDest = Routes.Login.name
+                    navController.navigateWithPopUpTo(Routes.Login.name, true)
+                },
+                goToHomeScreen = {
+                    startDest = Routes.Journals.name
+                    navController.navigateWithPopUpTo(Routes.Journals.name)
+                }
+            )
+        }
+
         composable(route = Routes.Journals.name) {
             JournalScreen(
                 onJournalClicked = {
@@ -214,6 +253,8 @@ fun Navigation() {
 }
 
 enum class Routes {
+    Login,
+    Register,
     Journals,
     JournalDetails,
     PostJournal,
