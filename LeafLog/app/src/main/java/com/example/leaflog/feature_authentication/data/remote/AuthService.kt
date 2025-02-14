@@ -5,7 +5,8 @@ import org.json.JSONObject
 
 object AuthService {
     var userName: String? = null
-    var userId: Int? = null
+        private set
+    private var userId: Int? = null
 
     fun login(name: String, password: String): String? {
         val payload = JSONObject()
@@ -45,5 +46,14 @@ object AuthService {
                 null
             }
         }
+    }
+
+    fun isLoggedIn(): Boolean {
+        return userName != null && userId != null
+    }
+
+    fun logOut() {
+        userName = null
+        userId = null
     }
 }
