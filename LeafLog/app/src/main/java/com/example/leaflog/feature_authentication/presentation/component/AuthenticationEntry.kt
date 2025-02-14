@@ -31,15 +31,13 @@ fun AuthenticationEntry(
     error: String? = null,
     isLoading: Boolean = false,
     isPassword: Boolean = false,
+    showPassword: Boolean = true,
+    onVisibilityPressed: (() -> Unit)? = null,
     onValueChange: (String) -> Unit,
 ) {
     val background = Color(0xFFB7DBC9)
     val line = Color(0xFF1D1B19)
     val textColor = Color(0xFF244537)
-
-    var showPassword by remember {
-        mutableStateOf(!isPassword)
-    }
 
     val hasError = error != null
     Box(modifier = modifier,) {
@@ -61,7 +59,9 @@ fun AuthenticationEntry(
             trailingIcon = {
                 if (isPassword) {
                     IconButton(onClick = {
-                        showPassword = !showPassword
+                        if (onVisibilityPressed != null) {
+                            onVisibilityPressed()
+                        }
                     }) {
                         Icon(
                             painter = if (showPassword)

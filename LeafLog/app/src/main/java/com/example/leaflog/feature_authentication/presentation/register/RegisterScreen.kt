@@ -16,7 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,6 +39,9 @@ fun RegisterScreen(
 ) {
     val background = Color(0xFFFFF8F5)
     val primary = Color(0xFF2E5B00)
+    var showPassword by remember {
+        mutableStateOf(false)
+    }
     val snackBarHostState = remember { SnackbarHostState() }
 
     val state = viewModel.state
@@ -105,7 +111,11 @@ fun RegisterScreen(
                     value = state.password,
                     error = state.passwordError,
                     isLoading = state.isLoading,
-                    isPassword = true
+                    isPassword = true,
+                    showPassword = showPassword,
+                    onVisibilityPressed = {
+                        showPassword = !showPassword
+                    }
                 ) { value ->
                     viewModel.onPasswordChange(value)
                 }
@@ -114,7 +124,11 @@ fun RegisterScreen(
                     value = state.confirmPassword,
                     error = state.confirmPasswordError,
                     isLoading = state.isLoading,
-                    isPassword = true
+                    isPassword = true,
+                    showPassword = showPassword,
+                    onVisibilityPressed = {
+                        showPassword = !showPassword
+                    }
                 ) { value ->
                     viewModel.onConfirmPasswordChange(value)
                 }
