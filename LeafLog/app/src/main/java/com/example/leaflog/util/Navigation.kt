@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.leaflog.feature_online_post.presentation.posts.PostsScreen
 import com.example.leaflog.feature_authentication.presentation.login.LoginScreen
 import com.example.leaflog.feature_authentication.presentation.register.RegisterScreen
 import com.example.leaflog.feature_journal.presentation.journal_details.JournalDetailsScreen
@@ -23,6 +24,7 @@ import com.example.leaflog.feature_log.presentation.logs.LogsScreen
 import com.example.leaflog.feature_log.presentation.set_log.GetDataScreen
 import com.example.leaflog.feature_log.presentation.set_log.SetLogScreen
 import com.example.leaflog.feature_log.presentation.set_log.SetLogViewModel
+import com.example.leaflog.feature_online_post.presentation.post_details.PostDetailsScreen
 import java.net.URLDecoder
 import java.net.URLEncoder
 
@@ -253,6 +255,61 @@ fun Navigation() {
                 }
             )
         }
+        composable(
+            route = Routes.Posts.name
+        ) {
+            PostsScreen(
+                goToLoginScreen = { },
+                onPostClicked = {
+                    val encodedTitle = URLEncoder.encode(it.title, "utf-8")
+                    val encodedDescription = URLEncoder.encode(it.description, "utf-8")
+                    val encodedPicture = URLEncoder.encode(it.picture, "utf-8")
+
+                    navController.navigate(
+                        "${Routes.PostDetails.name}/$encodedTitle/$encodedDescription/$encodedPicture/${it.height}/${it.water}/${it.temperature}/${it.relativeHumidity}/${it.lightLevel}/${it.created.time}"
+                    )
+                }
+            )
+        }
+        composable(
+            route = "${Routes.PostDetails.name}/{title}/{description}/{picture}/{height}/{water}/{temperature}/{relativeHumidity}/{lightLevel}/{created}",
+            arguments = listOf(
+                navArgument("title") { type = NavType.StringType },
+                navArgument("description") { type = NavType.StringType },
+                navArgument("picture") { type = NavType.StringType },
+                navArgument("height") { type = NavType.FloatType },
+                navArgument("water") { type = NavType.IntType },
+                navArgument("temperature") { nullable = true },
+                navArgument("relativeHumidity") { nullable = true },
+                navArgument("lightLevel") { nullable = true },
+                navArgument("created") { type = NavType.LongType },
+            )
+        ) {
+            val title = URLDecoder.decode(it.arguments?.getString("title") ?: "", "utf-8")
+            val description = URLDecoder.decode(it.arguments?.getString("description") ?: "", "utf-8")
+            val picture = URLDecoder.decode(it.arguments?.getString("picture") ?: "", "utf-8")
+            val height = it.arguments?.getFloat("height") ?: 0f
+            val water = it.arguments?.getInt("water") ?: 0
+            val temperature = it.arguments?.getString("temperature")?.toInt()
+            val relativeHumidity = it.arguments?.getString("relativeHumidity")?.toInt()
+            val lightLevel = it.arguments?.getString("lightLevel")?.toFloat()
+            val created = it.arguments?.getLong("created") ?: 0L
+
+            PostDetailsScreen(
+                title = title,
+                description = description,
+                picture = picture,
+                height = height,
+                water = water,
+                temperature = temperature,
+                relativeHumidity = relativeHumidity,
+                lightLevel = lightLevel,
+                created = created,
+                goBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
     }
 }
 
@@ -267,7 +324,9 @@ enum class Routes {
     GetData,
     Logs,
     LogDetails,
-    UpdateLog
+    UpdateLog,
+    Posts,
+    PostDetails
 }
 
 fun NavController.navigateWithPopUpTo(route: String, restore: Boolean = false) {
