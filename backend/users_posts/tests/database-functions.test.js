@@ -27,7 +27,10 @@ describe("userRegister", () => {
       password: "password123",
     };
 
+    const insertId = 1
+
     mockQuery.mockImplementationOnce((sql, name) => [testData, {}]);
+    mockQuery.mockImplementationOnce((sql, queryValues) => [{insertId: insertId}]);
 
     // Success response
     expect(await userRegister(req)).toEqual({
@@ -35,6 +38,9 @@ describe("userRegister", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         message: "Successfully registered.",
+        body: {
+          id: insertId
+        }
       }),
     });
 
@@ -119,6 +125,7 @@ describe("userLogin", () => {
       password: "password123",
     };
 
+    const insertId = 1
     mockQuery.mockImplementationOnce((sql, name) => [testData, {}]);
 
     expect(await userLogin(req)).toEqual({
@@ -126,6 +133,9 @@ describe("userLogin", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         message: "Successfully logged in.",
+        body: {
+          id: insertId
+        }
       }),
     });
 
@@ -209,11 +219,18 @@ describe("createPost", () => {
       "2024-12-04",
     ];
 
+    const insertId = 1
+
+    mockQuery.mockImplementationOnce((sql, queryValues) => [{insertId: insertId}]);
+
     expect(await createPost(req)).toEqual({
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         message: "Successfully created post.",
+        body: {
+          id: insertId
+        }
       }),
     });
 
