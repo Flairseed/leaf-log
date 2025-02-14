@@ -7,7 +7,6 @@ const {
   updatePost,
   deletePost,
   getPosts,
-  getPresignedUrl
 } = require("./functions/database-functions");
 
 exports.handler = async (event, context) => {
@@ -44,10 +43,6 @@ exports.handler = async (event, context) => {
       break;
     case "GET /posts":
       res = await getPosts();
-      break;
-    case "GET /get-presigned-url":
-      userName = event.queryStringParameters.name;
-      res = await getPresignedUrl(userName);
       break;
     default:
       res = response(404, { message: "Unsupported route: " + event.routeKey });

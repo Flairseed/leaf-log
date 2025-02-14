@@ -2,9 +2,6 @@ const mysql = require("mysql2/promise");
 const { response, displayErrors } = require("./response-functions");
 const { validateUser } = require("../models/user");
 const { validateCreatePost } = require("../models/createPost");
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
-
 require("dotenv").config();
 
 let connection = null;
@@ -40,12 +37,9 @@ async function userRegister(req) {
     const sql = "INSERT INTO user(name, password) VALUES(?, ?)";
     const queryValues = [req.name, req.password];
 
-    const [results] = await connection.query(sql, queryValues);
+    await connection.query(sql, queryValues);
     return response(200, {
       message: "Successfully registered.",
-      body: {
-        id: results.insertId
-      }
     });
   } catch (err) {
     console.log(err);
@@ -74,9 +68,6 @@ async function userLogin(req) {
     } else {
       return response(200, {
         message: "Successfully logged in.",
-        body: {
-          id: users[0].id
-        }
       });
     }
   } catch (err) {
@@ -111,12 +102,9 @@ async function createPost(req) {
       req.created,
     ];
 
-    const [results] = await connection.query(sql, queryValues);
+    await connection.query(sql, queryValues);
     return response(200, {
       message: "Successfully created post.",
-      body: {
-        id: results.insertId
-      }
     });
   } catch (err) {
     console.log(err);
@@ -225,7 +213,7 @@ async function deletePost(userId, postId) {
 
 async function getPosts() {
   try {
-    sql = "SELECT post.*, user.name FROM post JOIN user ON user.id = post.user_id;";
+    sql = "SELECT * FROM post";
     const [posts, fields] = await connection.query(sql);
     return response(200, {
       message: "Successfully retrieved posts.",
@@ -238,36 +226,6 @@ async function getPosts() {
     });
   }
 }
-
-async function getPresignedUrl(userName = null) {
-  try {
-    const s3 = new S3Client();
-    const s3Url = process.env.S3_URL;
-
-    const currentTime = Date.now();
-    const folder = process.env.S3_FOLDER;
-    const key = `${folder}/${userName}-${currentTime}.png`;
-
-    const command = new PutObjectCommand({ Bucket: process.env.BUCKET_NAME, Key: key });
-    const presignedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
-
-    const imagePath = `${s3Url}${key}`;
-
-    return response(200, {
-      message: "You have successfully generated a presigned s3 url",
-      body: {
-        url: presignedUrl,
-        imagePath: imagePath
-      }
-    });
-  } catch(err) {
-    console.log(err);
-    return response(500, {
-      message: "Internal server error."
-    });
-  }
-}
-
 module.exports = {
   connectToDatabase,
   userRegister,
@@ -276,5 +234,4 @@ module.exports = {
   updatePost,
   deletePost,
   getPosts,
-  getPresignedUrl
 };
