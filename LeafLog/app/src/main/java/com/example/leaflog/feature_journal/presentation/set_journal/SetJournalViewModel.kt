@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.leaflog.core.data.local.LocalDataBase
+import com.example.leaflog.feature_authentication.data.remote.AuthService
 import com.example.leaflog.feature_journal.data.model.Journal
 import com.example.leaflog.util.Services
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -135,7 +136,8 @@ class SetJournalViewModel(
                         title = state.title,
                         description = state.description,
                         picture = state.picture!!,
-                        created = Date.from(Instant.now())
+                        created = Date.from(Instant.now()),
+                        associatedUserId = _currentPost?.associatedUserId ?: AuthService.userId
                     )
                     if (postId == null) {
                         db.journalService().createJournal(journal)

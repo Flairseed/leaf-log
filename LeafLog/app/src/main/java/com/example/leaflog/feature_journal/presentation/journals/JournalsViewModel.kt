@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.leaflog.core.data.local.LocalDataBase
+import com.example.leaflog.feature_authentication.data.remote.AuthService
 import com.example.leaflog.util.Services
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -37,7 +38,11 @@ class JournalsViewModel(
             state = state.copy(isLoading = true)
             try {
                 state = state.copy(
-                    journals = db.journalService().getAllJournals()
+                    journals =
+                    if (AuthService.isLoggedIn())
+                        db.journalService().getAllJournals()
+                    else
+                    db.journalService().getAllJournalsWithoutAssociatedUser()
                 )
             } catch (_: Exception) {
                 _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error while loading journals"))
