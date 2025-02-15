@@ -173,7 +173,7 @@ class SetLogViewModel(
                         water = logs[0].water.toString(),
                         lightLevel = logs[0].lightLevel,
                         relativeHumidity = logs[0].relativeHumidity,
-                        temperature = logs[0].temperature
+                        temperature = logs[0].temperature,
                     )
                 }
             } catch (_: Exception) {
@@ -250,7 +250,8 @@ class SetLogViewModel(
                         lightLevel = state.lightLevel,
                         temperature = state.temperature,
                         relativeHumidity = state.relativeHumidity,
-                        created = Date()
+                        created = Date(),
+                        postId = _currentLog?.postId
                     )
                     if (logId == null) {
                         db.logService().createLog(log)

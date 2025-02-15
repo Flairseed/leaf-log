@@ -1,27 +1,24 @@
-package com.example.leaflog.feature_journal.presentation.journals
+package com.example.leaflog.feature_online_post.presentation.posts
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.leaflog.core.data.local.LocalDataBase
-import com.example.leaflog.feature_authentication.data.remote.AuthService
-import com.example.leaflog.util.Services
+import com.example.leaflog.feature_online_post.data.remote.OnlinePostService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-class JournalsViewModel(
-    private val db: LocalDataBase = Services.localDb
-) : ViewModel() {
-    var state by mutableStateOf(JournalsState())
+class PostsViewModel : ViewModel() {
+    var state by mutableStateOf(PostsState())
         private set
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    sealed class UiEvent() {
+    sealed class UiEvent {
         data class ShowSnackbar(val message: String) : UiEvent()
     }
 
@@ -34,18 +31,19 @@ class JournalsViewModel(
             return
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             state = state.copy(isLoading = true)
             try {
-                state = state.copy(
-                    journals =
-                    if (AuthService.isLoggedIn())
-                        db.journalService().getAllJournals()
-                    else
-                    db.journalService().getAllJournalsWithoutAssociatedUser()
-                )
+                val posts = OnlinePostService.getPosts()
+                if (posts == null) {
+                    _eventFlow.emit(UiEvent.ShowSnackbar("Internal server error"))
+                } else {
+                    state = state.copy(
+                        posts = posts
+                    )
+                }
             } catch (_: Exception) {
-                _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error while loading journals"))
+                _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error while loading logs"))
             } finally {
                 state = state.copy(isLoading = false)
             }

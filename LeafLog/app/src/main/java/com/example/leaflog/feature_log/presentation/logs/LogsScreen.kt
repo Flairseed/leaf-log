@@ -111,7 +111,7 @@ fun LogsScreen(
     ) {
         if (state.isLoading) {
             Box(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()

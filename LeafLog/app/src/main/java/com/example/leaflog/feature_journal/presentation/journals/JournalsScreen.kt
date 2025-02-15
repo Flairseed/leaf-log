@@ -44,15 +44,9 @@ import kotlinx.coroutines.launch
 fun JournalScreen(
     viewModel: JournalsViewModel = viewModel(),
     onJournalClicked: (journalId: Journal) -> Unit,
-    onFABClicked: () -> Unit,
-    goToLoginScreen: () -> Unit
+    snackBarHostState: SnackbarHostState,
+    padding: PaddingValues
 ) {
-    val background = Color(0xFFFFF8F5)
-    val secondaryContainer = Color(0xFFB7DBC9)
-    val onSecondaryContainer = Color(0xFF244537)
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-    val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest {
@@ -67,54 +61,9 @@ fun JournalScreen(
     }
 
     val state = viewModel.state
-
-    ModalNavigationDrawer(
-        drawerContent = {
-            AppDrawer(
-                modifier = Modifier.width(300.dp)
-            ) {
-                if (AuthService.isLoggedIn()) {
-                    AuthService.logOut()
-                }
-                goToLoginScreen()
-            }
-        },
-        drawerState = drawerState
-    ) {
-        Scaffold(
-            snackbarHost = { SnackbarHost(snackBarHostState) },
-            topBar = {
-                AppBar(
-                    label = "Journals",
-                    onProfileClicked = {
-                        scope.launch {
-                            if (drawerState.isClosed) {
-                                drawerState.open()
-                            } else {
-                                drawerState.close()
-                            }
-                        }
-                    }
-                )
-            },
-            floatingActionButton = {
-                LargeFloatingActionButton(
-                    containerColor = secondaryContainer,
-                    contentColor = onSecondaryContainer,
-                    onClick = onFABClicked
-                ) {
-                    Icon(
-                        modifier = Modifier.size(36.dp),
-                        imageVector = Icons.Default.Add,
-                        contentDescription = ""
-                    )
-                }
-            },
-            containerColor = background
-        ) {
             if (state.isLoading) {
                 Box(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
@@ -123,8 +72,8 @@ fun JournalScreen(
                 LazyVerticalGrid(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(it)
-                        .consumeWindowInsets(it),
+                        .padding(padding)
+                        .consumeWindowInsets(padding),
                     columns = GridCells.Fixed(2),
                     contentPadding = PaddingValues(top = 55.dp)
                 ) {
@@ -142,6 +91,4 @@ fun JournalScreen(
                     }
                 }
             }
-        }
-    }
 }

@@ -1,14 +1,16 @@
 package com.example.leaflog.feature_authentication.data.remote
 
 import com.example.leaflog.core.data.remote.HttpHandler
+import com.example.leaflog.util.Services
 import org.json.JSONObject
 
 object AuthService {
     var userName: String? = null
         private set
-    private var userId: Int? = null
+    var userId: Int? = null
+        private set
 
-    fun login(name: String, password: String): String? {
+    suspend fun login(name: String, password: String): String? {
         val payload = JSONObject()
         payload.put("name", name)
         payload.put("password", password)
@@ -23,12 +25,13 @@ object AuthService {
             else -> {
                 userId = (JSONObject(response)["body"] as JSONObject)["id"] as Int
                 userName = name
+                Services.localDb.journalService().updateJournalAssociatedUserId()
                 null
             }
         }
     }
 
-    fun register(name: String, password: String): String? {
+    suspend fun register(name: String, password: String): String? {
         val payload = JSONObject()
         payload.put("name", name)
         payload.put("password", password)
@@ -43,6 +46,7 @@ object AuthService {
             else -> {
                 userId = (JSONObject(response)["body"] as JSONObject)["id"] as Int
                 userName = name
+                Services.localDb.journalService().updateJournalAssociatedUserId()
                 null
             }
         }

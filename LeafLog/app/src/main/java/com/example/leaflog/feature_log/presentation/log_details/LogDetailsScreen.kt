@@ -20,7 +20,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
@@ -30,18 +33,25 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.example.leaflog.core.presentation.component.CustomButton
+import com.example.leaflog.feature_authentication.data.remote.AuthService
 import com.example.leaflog.feature_log.presentation.component.LogPage
 import com.example.leaflog.ui.theme.schoolBellFamily
 import kotlinx.coroutines.flow.collectLatest
@@ -56,10 +66,18 @@ fun LogDetailsScreen(
     val surface = Color(0xFFFFF8F5)
     val error = Color(0xFFBA1A1A)
     val onError = Color(0xFFFFFFFF)
+    val surfaceContainer = Color(0xFFF3EDE9)
+    val onSurface = Color(0xFF1D1B19)
+    val primary = Color(0xFF2E5B00)
+
+    val context = LocalContext.current
 
     val columnScroll = rememberScrollState()
     val titleScroll = rememberScrollState()
     val descriptionScroll = rememberScrollState()
+    var showDialog by remember {
+        mutableStateOf(false)
+    }
 
     val viewModel = viewModel {
         LogDetailsViewModel(logId = logId)
@@ -79,6 +97,18 @@ fun LogDetailsScreen(
                 is LogDetailsViewModel.UiEvent.Deleted -> {
                     onDelete()
                 }
+                is LogDetailsViewModel.UiEvent.SetOnline -> {
+                    viewModel.getData()
+                    snackBarHostState.showSnackbar(
+                        message = "Successfully set log online"
+                    )
+                }
+                is LogDetailsViewModel.UiEvent.DeleteOnline -> {
+                    viewModel.getData()
+                    snackBarHostState.showSnackbar(
+                        message = "Successfully deleted log online"
+                    )
+                }
             }
         }
     }
@@ -86,12 +116,28 @@ fun LogDetailsScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackBarHostState) },
         topBar = {
-            Box(modifier = Modifier.height(80.dp)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp)
+            ) {
                 IconButton(
                     modifier = Modifier.align(Alignment.CenterStart),
                     onClick = goBack
                 ) {
                     Icon(imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = "")
+                }
+                if (AuthService.isLoggedIn()) {
+                    IconButton(
+                        modifier = Modifier.align(Alignment.CenterEnd),
+                        onClick = {
+                            if (!state.isLoading) {
+                                showDialog = true
+                            }
+                        }
+                    ) {
+                        Icon(imageVector = Icons.Default.Share, contentDescription = "")
+                    }
                 }
             }
         },
@@ -126,9 +172,88 @@ fun LogDetailsScreen(
         floatingActionButtonPosition = FabPosition.Center,
         containerColor = surface
     ) {
+        if (showDialog) {
+            Dialog(
+                onDismissRequest = { showDialog = false },
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    colors = CardDefaults.cardColors().copy(
+                        containerColor = surfaceContainer,
+                        contentColor = onSurface
+                    )
+                ) {
+                    Column {
+                        Text(
+                            text = if (state.log?.postId == null)
+                                "This log has not been posted online yet."
+                            else
+                                "This log has been posted online.",
+                            modifier = Modifier.padding(16.dp),
+                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                        ) {
+                            if (state.log?.postId == null) {
+                                TextButton(
+                                    onClick = {
+                                        showDialog = false
+                                        viewModel.setLogOnline(context)
+                                    },
+                                    modifier = Modifier.padding(8.dp),
+                                ) {
+                                    Text(
+                                        text= "Post",
+                                        color = primary
+                                    )
+                                }
+                            } else {
+                                TextButton(
+                                    onClick = {
+                                        showDialog = false
+                                        viewModel.setLogOnline(context)
+                                    },
+                                    modifier = Modifier.padding(8.dp),
+                                ) {
+                                    Text(
+                                        text = "Update",
+                                        color = primary
+                                    )
+                                }
+                                TextButton(
+                                    onClick = {
+                                        showDialog = false
+                                        viewModel.deleteLogOnline()
+                                    },
+                                    modifier = Modifier.padding(8.dp),
+                                ) {
+                                    Text(
+                                        text = "Delete",
+                                        color = primary
+                                    )
+                                }
+                            }
+                            TextButton(
+                                onClick = { showDialog = false },
+                                modifier = Modifier.padding(8.dp),
+                            ) {
+                                Text(
+                                    text = "Cancel",
+                                    color = primary
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
         if (state.isLoading) {
             Box(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
