@@ -32,6 +32,7 @@ class LogDetailsViewModel(
         data class ShowSnackbar(val message: String) : UiEvent()
         data object Deleted: UiEvent()
         data object SetOnline: UiEvent()
+        data object DeleteOnline: UiEvent()
     }
 
     init {
@@ -119,6 +120,39 @@ class LogDetailsViewModel(
                 }
             } catch (_: Exception) {
                 _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error while uploading"))
+            } finally {
+                state = state.copy(isLoading = false)
+            }
+        }
+    }
+
+    fun deleteLogOnline() {
+        if (state.isLoading || AuthService.userId == null || state.log?.postId == null) {
+            return
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            state = state.copy(isLoading = true)
+            try {
+                when (OnlinePostService.deletePost(AuthService.userId!!, state.log!!.postId!!)) {
+                    null -> {
+                        _eventFlow.emit(UiEvent.ShowSnackbar("Internal server error"))
+
+                    }
+                    HttpHandler.FORBIDDEN -> {
+                        _eventFlow.emit(UiEvent.ShowSnackbar("You are not allowed to delete this file"))
+                    }
+                    else -> {
+                        db.logService().updateLog(
+                            state.log!!.copy(
+                                postId = null
+                            )
+                        )
+                        _eventFlow.emit(UiEvent.DeleteOnline)
+                    }
+                }
+            } catch (_: Exception) {
+                _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error while deleting online post"))
             } finally {
                 state = state.copy(isLoading = false)
             }

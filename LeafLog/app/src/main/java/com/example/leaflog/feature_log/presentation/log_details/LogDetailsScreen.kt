@@ -98,10 +98,16 @@ fun LogDetailsScreen(
                     onDelete()
                 }
                 is LogDetailsViewModel.UiEvent.SetOnline -> {
-                    snackBarHostState.showSnackbar(
-                        message = "Successfully set log"
-                    )
                     viewModel.getData()
+                    snackBarHostState.showSnackbar(
+                        message = "Successfully set log online"
+                    )
+                }
+                is LogDetailsViewModel.UiEvent.DeleteOnline -> {
+                    viewModel.getData()
+                    snackBarHostState.showSnackbar(
+                        message = "Successfully deleted log online"
+                    )
                 }
             }
         }
@@ -125,7 +131,9 @@ fun LogDetailsScreen(
                     IconButton(
                         modifier = Modifier.align(Alignment.CenterEnd),
                         onClick = {
-                            showDialog = true
+                            if (!state.isLoading) {
+                                showDialog = true
+                            }
                         }
                     ) {
                         Icon(imageVector = Icons.Default.Share, contentDescription = "")
@@ -217,7 +225,10 @@ fun LogDetailsScreen(
                                     )
                                 }
                                 TextButton(
-                                    onClick = { showDialog = false },
+                                    onClick = {
+                                        showDialog = false
+                                        viewModel.deleteLogOnline()
+                                    },
                                     modifier = Modifier.padding(8.dp),
                                 ) {
                                     Text(

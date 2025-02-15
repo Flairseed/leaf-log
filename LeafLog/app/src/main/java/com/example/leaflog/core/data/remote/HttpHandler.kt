@@ -113,4 +113,32 @@ object HttpHandler {
 
         return responseCode == HttpURLConnection.HTTP_OK
     }
+    fun deleteData(url: String): String? {
+        val urlObject = URL(url)
+        val con = urlObject.openConnection() as HttpURLConnection
+        con.requestMethod = DELETE
+
+        val responseCode = con.responseCode
+
+        return when (responseCode) {
+            HttpURLConnection.HTTP_OK -> {
+                val reader = BufferedReader(InputStreamReader(con.inputStream))
+                var line: String?
+                val response = StringBuffer()
+                while (reader.readLine().also { line = it } != null) {
+                    response.append(line)
+                }
+                reader.close()
+                con.disconnect()
+                response.toString()
+            }
+            HttpURLConnection.HTTP_FORBIDDEN -> {
+                FORBIDDEN
+            }
+            else -> {
+                null
+            }
+        }
+    }
+
 }

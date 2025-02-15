@@ -52,4 +52,9 @@ object OnlinePostService {
         )
         return postResponse
     }
+
+    fun deletePost(userId: Int, postId: Int): String? {
+        val response = HttpHandler.deleteData("${HttpHandler.BACKEND_URL}/posts/$postId?userId=$userId")
+        return response
+    }
 }
