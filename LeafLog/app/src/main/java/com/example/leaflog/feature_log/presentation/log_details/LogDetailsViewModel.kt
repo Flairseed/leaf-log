@@ -1,15 +1,22 @@
 package com.example.leaflog.feature_log.presentation.log_details
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.leaflog.core.data.local.LocalDataBase
+import com.example.leaflog.core.data.remote.HttpHandler
+import com.example.leaflog.feature_authentication.data.remote.AuthService
+import com.example.leaflog.feature_online_post.data.model.SetPostModel
+import com.example.leaflog.feature_online_post.data.remote.OnlinePostService
 import com.example.leaflog.util.Services
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 class LogDetailsViewModel(
     private val db: LocalDataBase = Services.localDb,
@@ -24,6 +31,7 @@ class LogDetailsViewModel(
     sealed class UiEvent() {
         data class ShowSnackbar(val message: String) : UiEvent()
         data object Deleted: UiEvent()
+        data object SetOnline: UiEvent()
     }
 
     init {
@@ -64,6 +72,53 @@ class LogDetailsViewModel(
                 _eventFlow.emit(UiEvent.Deleted)
             } catch (_: Exception) {
                 _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error while deleting"))
+            } finally {
+                state = state.copy(isLoading = false)
+            }
+        }
+    }
+
+    fun setLogOnline(context: Context) {
+        if (state.isLoading || state.log == null || !AuthService.isLoggedIn()) {
+            return
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            state = state.copy(isLoading = true)
+            try {
+                val post = SetPostModel(
+                    userId = AuthService.userId!!,
+                    title = state.log!!.title,
+                    picture = state.log!!.picture,
+                    description = state.log!!.description,
+                    height = state.log!!.height,
+                    water = state.log!!.water,
+                    relativeHumidity = state.log!!.relativeHumidity,
+                    temperature = state.log!!.relativeHumidity,
+                    lightLevel = state.log!!.lightLevel,
+                    created = state.log!!.created
+                )
+                when (val response = OnlinePostService.setPost(post, state.log!!.postId, context)) {
+                    null -> {
+                        _eventFlow.emit(UiEvent.ShowSnackbar("Internal server error"))
+
+                    }
+                    HttpHandler.FORBIDDEN -> {
+                        _eventFlow.emit(UiEvent.ShowSnackbar("You are not allowed to modify this file"))
+                    }
+                    else -> {
+                        if (state.log!!.postId == null) {
+                            db.logService().updateLog(
+                                state.log!!.copy(
+                                    postId = (JSONObject(response)["body"] as JSONObject)["id"] as Int
+                                )
+                            )
+                        }
+                        _eventFlow.emit(UiEvent.SetOnline)
+                    }
+                }
+            } catch (_: Exception) {
+                _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error while uploading"))
             } finally {
                 state = state.copy(isLoading = false)
             }

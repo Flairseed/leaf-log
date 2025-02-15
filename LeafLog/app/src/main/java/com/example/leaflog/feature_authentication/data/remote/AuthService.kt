@@ -6,7 +6,8 @@ import org.json.JSONObject
 object AuthService {
     var userName: String? = null
         private set
-    private var userId: Int? = null
+    var userId: Int? = null
+        private set
 
     fun login(name: String, password: String): String? {
         val payload = JSONObject()
