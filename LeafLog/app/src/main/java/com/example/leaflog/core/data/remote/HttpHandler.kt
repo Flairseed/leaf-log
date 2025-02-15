@@ -1,9 +1,13 @@
 package com.example.leaflog.core.data.remote
 
+import android.content.Context
+import android.net.Uri
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.BufferedWriter
-import java.io.InputStream
+import java.io.DataOutputStream
+import java.io.File
+import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
@@ -76,5 +80,37 @@ object HttpHandler {
                 null
             }
         }
+    }
+
+    fun postPicture(url: String, fileUri: String, context: Context): Boolean {
+        val uri = Uri.parse(fileUri)
+        val file = File(context.cacheDir, "image")
+
+        // Copy uri content to a newly created cached file
+        context.contentResolver.openInputStream(uri)?.use { inputStream ->
+            file.outputStream().use { outputStream ->
+                inputStream.copyTo(outputStream)
+            }
+        }
+
+        val urlObject = URL(url)
+        val con = urlObject.openConnection() as HttpURLConnection
+        con.requestMethod = PUT
+        con.doOutput = true
+        con.setRequestProperty("Content-Type", "image/png")
+
+        val outputStream = DataOutputStream(con.outputStream)
+        val fileInputStream = FileInputStream(file)
+        fileInputStream.copyTo(outputStream, 1024 * 1024)
+
+        outputStream.flush()
+        outputStream.close()
+        fileInputStream.close()
+
+        val responseCode = con.responseCode
+
+        con.disconnect()
+
+        return responseCode == HttpURLConnection.HTTP_OK
     }
 }
