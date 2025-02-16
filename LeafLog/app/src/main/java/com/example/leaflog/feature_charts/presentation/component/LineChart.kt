@@ -140,7 +140,7 @@ fun LineChart(
                 // Lines
                 if (i < finalValues.size - 1) {
                     val value2 = finalValues[i + 1]
-                    val y2 = size.height - (if (maxValue != 0f) (if (relative) (if (value != minValue) ((value - minValue) / (maxValue - minValue)) else 0f) else (value2 / maxValue)) else 0f) * maxPlotHeight - bottomOffset
+                    val y2 = size.height - (if (maxValue != 0f) (if (relative) (if (value2 != minValue) ((value2 - minValue) / (maxValue - minValue)) else 0f) else (value2 / maxValue)) else 0f) * maxPlotHeight - bottomOffset
                     val x2 = (i + 1) * distBetweenPoints + leftOffset
                     drawLine(
                         color = primaryContainer,

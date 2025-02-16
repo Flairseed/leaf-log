@@ -90,7 +90,7 @@ fun AnalyticsScreen(
         ) {
             DropDownEntry(
                 valuesList = state.journals.map {
-                    it.title
+                    "${it.title} (${it.id})"
                 },
                 value = state.currentJournalIndex,
                 label = "Journal"

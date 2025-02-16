@@ -98,13 +98,11 @@ fun LogDetailsScreen(
                     onDelete()
                 }
                 is LogDetailsViewModel.UiEvent.SetOnline -> {
-                    viewModel.getData()
                     snackBarHostState.showSnackbar(
                         message = "Successfully set log online"
                     )
                 }
                 is LogDetailsViewModel.UiEvent.DeleteOnline -> {
-                    viewModel.getData()
                     snackBarHostState.showSnackbar(
                         message = "Successfully deleted log online"
                     )

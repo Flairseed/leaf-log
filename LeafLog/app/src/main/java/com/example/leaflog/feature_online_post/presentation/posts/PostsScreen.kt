@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.leaflog.feature_log.presentation.component.LogSimple
@@ -32,7 +33,7 @@ fun PostsScreen(
     padding: PaddingValues,
     snackBarHostState: SnackbarHostState
 ) {
-
+    val secondary = Color(0xFF446557)
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest {
@@ -47,46 +48,47 @@ fun PostsScreen(
     }
 
     val state = viewModel.state
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .consumeWindowInsets(padding),
-                horizontalAlignment = Alignment.CenterHorizontally
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
+            .consumeWindowInsets(padding),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CustomButton(
+            modifier = Modifier.padding(vertical = 20.dp),
+            label = "Refresh",
+            leadingIcon = Icons.Default.Refresh,
+            color = secondary
+        ) {
+            viewModel.getData()
+        }
+        if (state.isLoading || !state.initialized) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                CustomButton(
-                    modifier = Modifier.padding(vertical = 20.dp),
-                    label = "Refresh",
-                    leadingIcon = Icons.Default.Refresh
-                ) {
-                    viewModel.getData()
-                }
-                if (state.isLoading) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                } else {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        contentPadding = PaddingValues(top = 55.dp)
-                    ) {
-                        items(state.posts) { post ->
-                            LogSimple(
-                                modifier = Modifier
-                                    .padding(10.dp)
-                                    .clickable {
-                                        onPostClicked(post)
-                                    },
-                                title = post.title,
-                                picture = post.picture,
-                                created = post.created,
-                                author = post.name
-                            )
-                        }
-                    }
+                CircularProgressIndicator()
+            }
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(top = 55.dp)
+            ) {
+                items(state.posts) { post ->
+                    LogSimple(
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onPostClicked(post)
+                            },
+                        title = post.title,
+                        picture = post.picture,
+                        created = post.created,
+                        author = post.name
+                    )
                 }
             }
+        }
+    }
 }

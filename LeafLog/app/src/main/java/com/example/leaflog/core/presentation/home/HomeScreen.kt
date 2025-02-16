@@ -1,5 +1,6 @@
 package com.example.leaflog.core.presentation.home
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -19,8 +20,10 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +38,7 @@ import com.example.leaflog.feature_journal.data.model.Journal
 import com.example.leaflog.feature_journal.presentation.journals.JournalScreen
 import com.example.leaflog.feature_online_post.data.model.GetPostModel
 import com.example.leaflog.feature_online_post.presentation.posts.PostsScreen
+import com.example.leaflog.util.NavigationAnimation
 import kotlinx.coroutines.launch
 
 @Composable
@@ -53,8 +57,21 @@ fun HomeScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
-    var selectedIndex by remember {
+    var selectedIndex by rememberSaveable {
         mutableIntStateOf(0)
+    }
+
+    var screen1 by remember {
+        mutableStateOf(true)
+    }
+    var screen2 by remember {
+        mutableStateOf(false)
+    }
+    var screen3 by remember {
+        mutableStateOf(false)
+    }
+    var transitionRight by remember {
+        mutableStateOf(true)
     }
 
     val label = when (selectedIndex) {
@@ -122,6 +139,7 @@ fun HomeScreen(
                         ),
                         selected = selectedIndex == 0,
                         onClick = {
+                            transitionRight = false
                             selectedIndex = 0
                         },
                         icon = {
@@ -144,6 +162,7 @@ fun HomeScreen(
                         ),
                         selected = selectedIndex == 1,
                         onClick = {
+                            transitionRight = selectedIndex < 1
                             selectedIndex = 1
                         },
                         icon = {
@@ -166,6 +185,7 @@ fun HomeScreen(
                         ),
                         selected = selectedIndex == 2,
                         onClick = {
+                            transitionRight = true
                             selectedIndex = 2
                         },
                         icon = {
@@ -183,17 +203,61 @@ fun HomeScreen(
             containerColor = background
         ) {
             when (selectedIndex) {
-                0 -> JournalScreen(
+                0 -> {
+                    screen1 = true
+                    screen2 = false
+                    screen3 = false
+                }
+                1 -> {
+                    screen1 = false
+                    screen2 = true
+                    screen3 = false
+                }
+                2 -> {
+                    screen1 = false
+                    screen2 = false
+                    screen3 = true
+                }
+            }
+
+            val enterTransition = if (transitionRight)
+                NavigationAnimation.slideIn
+            else
+                NavigationAnimation.slideOutEnter
+            val exitTransition = if (transitionRight)
+                NavigationAnimation.slideInExit
+            else
+                NavigationAnimation.slideOut
+
+
+            AnimatedVisibility(
+                visible = screen1,
+                enter = enterTransition,
+                exit = exitTransition
+            ) {
+                JournalScreen(
                     onJournalClicked = onJournalClicked,
                     snackBarHostState = snackBarHostState,
                     padding = it
                 )
-                1 -> PostsScreen(
+            }
+            AnimatedVisibility(
+                visible = screen2,
+                enter = enterTransition,
+                exit = exitTransition
+            ) {
+                PostsScreen(
                     onPostClicked = onPostClicked,
                     snackBarHostState = snackBarHostState,
                     padding = it
                 )
-                2 -> AnalyticsScreen(
+            }
+            AnimatedVisibility(
+                visible = screen3,
+                enter = enterTransition,
+                exit = exitTransition
+            ) {
+                AnalyticsScreen(
                     snackBarHostState = snackBarHostState,
                     padding = it
                 )

@@ -85,6 +85,7 @@ class LogDetailsViewModel(
         }
 
         viewModelScope.launch(Dispatchers.IO) {
+            var success = false
             state = state.copy(isLoading = true)
             try {
                 val post = SetPostModel(
@@ -116,12 +117,14 @@ class LogDetailsViewModel(
                             )
                         }
                         _eventFlow.emit(UiEvent.SetOnline)
+                        success = true
                     }
                 }
             } catch (_: Exception) {
                 _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error while uploading"))
             } finally {
                 state = state.copy(isLoading = false)
+                if (success) getData()
             }
         }
     }
@@ -132,6 +135,7 @@ class LogDetailsViewModel(
         }
 
         viewModelScope.launch(Dispatchers.IO) {
+            var success = false
             state = state.copy(isLoading = true)
             try {
                 when (OnlinePostService.deletePost(AuthService.userId!!, state.log!!.postId!!)) {
@@ -149,12 +153,14 @@ class LogDetailsViewModel(
                             )
                         )
                         _eventFlow.emit(UiEvent.DeleteOnline)
+                        success = true
                     }
                 }
             } catch (_: Exception) {
                 _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error while deleting online post"))
             } finally {
                 state = state.copy(isLoading = false)
+                if (success) getData()
             }
         }
     }

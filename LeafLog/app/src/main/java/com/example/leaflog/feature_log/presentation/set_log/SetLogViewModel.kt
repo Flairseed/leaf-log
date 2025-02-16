@@ -44,6 +44,7 @@ class SetLogViewModel(
     sealed class UiEvent {
         data class ShowSnackbar(val message: String) : UiEvent()
         data object Posted: UiEvent()
+        data object Updated: UiEvent()
     }
 
     init {
@@ -255,10 +256,11 @@ class SetLogViewModel(
                     )
                     if (logId == null) {
                         db.logService().createLog(log)
+                        _eventFlow.emit(UiEvent.Posted)
                     } else {
                         db.logService().updateLog(log)
+                        _eventFlow.emit(UiEvent.Updated)
                     }
-                    _eventFlow.emit(UiEvent.Posted)
                 } catch (_: Exception) {
                     _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error"))
                 } finally {
