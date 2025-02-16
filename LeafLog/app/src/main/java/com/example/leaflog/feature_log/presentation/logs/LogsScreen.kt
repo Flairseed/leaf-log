@@ -123,7 +123,7 @@ fun LogsScreen(
                     .padding(it)
                     .consumeWindowInsets(it),
                 columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(top = 55.dp)
+                contentPadding = PaddingValues(top = 55.dp, bottom = 110.dp)
             ) {
                 items(state.logs) { log ->
                     LogSimple(

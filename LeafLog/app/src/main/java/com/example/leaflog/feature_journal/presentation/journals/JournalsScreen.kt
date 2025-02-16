@@ -61,34 +61,34 @@ fun JournalScreen(
     }
 
     val state = viewModel.state
-            if (state.isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else {
-                LazyVerticalGrid(
+    if (state.isLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    } else {
+        LazyVerticalGrid(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .consumeWindowInsets(padding),
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(top = 55.dp, bottom = 110.dp)
+        ) {
+            items(state.journals) { book ->
+                Book(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .consumeWindowInsets(padding),
-                    columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(top = 55.dp)
-                ) {
-                    items(state.journals) { book ->
-                        Book(
-                            modifier = Modifier
-                                .padding(10.dp)
-                                .clickable {
-                                    onJournalClicked(book)
-                                },
-                            title = book.title,
-                            description = book.description,
-                            image = book.picture
-                        )
-                    }
-                }
+                        .padding(10.dp)
+                        .clickable {
+                            onJournalClicked(book)
+                        },
+                    title = book.title,
+                    description = book.description,
+                    image = book.picture
+                )
             }
+        }
+    }
 }
