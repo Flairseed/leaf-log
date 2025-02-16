@@ -1,6 +1,7 @@
 package com.example.leaflog.feature_journal.presentation.set_journal
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,8 +10,11 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Create
@@ -52,6 +56,7 @@ fun SetJournalScreen(
     }
     val state = viewModel.state
     val snackBarHostState = remember { SnackbarHostState() }
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest {
@@ -94,7 +99,9 @@ fun SetJournalScreen(
         ) {
             Column(
                 modifier = Modifier
-                    .align(Alignment.TopCenter),
+                    .align(Alignment.TopCenter)
+                    .verticalScroll(scrollState)
+                    .imePadding(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 BookImageSelector(
