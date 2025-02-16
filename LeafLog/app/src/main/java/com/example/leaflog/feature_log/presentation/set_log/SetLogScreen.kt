@@ -50,6 +50,7 @@ fun SetLogScreen(
     viewModel: SetLogViewModel,
     onGetData: () -> Unit,
     onPost: () -> Unit,
+    onUpdate: () -> Unit,
     goBack: () -> Unit
 ) {
     val surface = Color(0xFFFFF8F5)
@@ -71,6 +72,8 @@ fun SetLogScreen(
                     )
                 } is SetLogViewModel.UiEvent.Posted -> {
                     onPost()
+                } is SetLogViewModel.UiEvent.Updated -> {
+                    onUpdate()
                 }
             }
         }

@@ -171,6 +171,7 @@ fun Navigation() {
                     navController.popBackStack()
                     navController.navigate("${Routes.Logs.name}/$journalId")
                 },
+                onUpdate = {},
                 goBack = {
                     navController.popBackStack()
                 }
@@ -257,6 +258,13 @@ fun Navigation() {
                     navController.popBackStack()
                     navController.popBackStack()
                     navController.navigate("${Routes.Logs.name}/$journalId")
+                },
+                onUpdate = {
+                    navController.popBackStack()
+                    navController.popBackStack()
+                    navController.popBackStack()
+                    navController.navigate("${Routes.Logs.name}/$journalId")
+                    navController.navigate("${Routes.LogDetails.name}/$journalId/$logId")
                 },
                 goBack = {
                     navController.popBackStack()
