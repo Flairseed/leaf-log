@@ -45,7 +45,7 @@ class PostsViewModel : ViewModel() {
             } catch (_: Exception) {
                 _eventFlow.emit(UiEvent.ShowSnackbar("There has been an error while loading logs"))
             } finally {
-                state = state.copy(isLoading = false)
+                state = state.copy(isLoading = false, initialized = true)
             }
         }
     }

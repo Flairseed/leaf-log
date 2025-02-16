@@ -48,47 +48,47 @@ fun PostsScreen(
     }
 
     val state = viewModel.state
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .consumeWindowInsets(padding),
-                horizontalAlignment = Alignment.CenterHorizontally
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
+            .consumeWindowInsets(padding),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CustomButton(
+            modifier = Modifier.padding(vertical = 20.dp),
+            label = "Refresh",
+            leadingIcon = Icons.Default.Refresh,
+            color = secondary
+        ) {
+            viewModel.getData()
+        }
+        if (state.isLoading || !state.initialized) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                CustomButton(
-                    modifier = Modifier.padding(vertical = 20.dp),
-                    label = "Refresh",
-                    leadingIcon = Icons.Default.Refresh,
-                    color = secondary
-                ) {
-                    viewModel.getData()
-                }
-                if (state.isLoading) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                } else {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        contentPadding = PaddingValues(top = 55.dp)
-                    ) {
-                        items(state.posts) { post ->
-                            LogSimple(
-                                modifier = Modifier
-                                    .padding(10.dp)
-                                    .clickable {
-                                        onPostClicked(post)
-                                    },
-                                title = post.title,
-                                picture = post.picture,
-                                created = post.created,
-                                author = post.name
-                            )
-                        }
-                    }
+                CircularProgressIndicator()
+            }
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(top = 55.dp)
+            ) {
+                items(state.posts) { post ->
+                    LogSimple(
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clickable {
+                                onPostClicked(post)
+                            },
+                        title = post.title,
+                        picture = post.picture,
+                        created = post.created,
+                        author = post.name
+                    )
                 }
             }
+        }
+    }
 }
