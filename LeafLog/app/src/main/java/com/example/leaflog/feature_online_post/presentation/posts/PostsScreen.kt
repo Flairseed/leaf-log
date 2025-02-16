@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.leaflog.feature_log.presentation.component.LogSimple
@@ -32,7 +33,7 @@ fun PostsScreen(
     padding: PaddingValues,
     snackBarHostState: SnackbarHostState
 ) {
-
+    val secondary = Color(0xFF446557)
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest {
@@ -57,7 +58,8 @@ fun PostsScreen(
                 CustomButton(
                     modifier = Modifier.padding(vertical = 20.dp),
                     label = "Refresh",
-                    leadingIcon = Icons.Default.Refresh
+                    leadingIcon = Icons.Default.Refresh,
+                    color = secondary
                 ) {
                     viewModel.getData()
                 }
