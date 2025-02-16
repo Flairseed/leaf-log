@@ -30,6 +30,7 @@ import com.example.leaflog.R
 import com.example.leaflog.core.presentation.component.AppBar
 import com.example.leaflog.core.presentation.component.AppDrawer
 import com.example.leaflog.feature_authentication.data.remote.AuthService
+import com.example.leaflog.feature_charts.presentation.analytics.AnalyticsScreen
 import com.example.leaflog.feature_journal.data.model.Journal
 import com.example.leaflog.feature_journal.presentation.journals.JournalScreen
 import com.example.leaflog.feature_online_post.data.model.GetPostModel
@@ -189,6 +190,10 @@ fun HomeScreen(
                 )
                 1 -> PostsScreen(
                     onPostClicked = onPostClicked,
+                    snackBarHostState = snackBarHostState,
+                    padding = it
+                )
+                2 -> AnalyticsScreen(
                     snackBarHostState = snackBarHostState,
                     padding = it
                 )
