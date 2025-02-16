@@ -1,5 +1,12 @@
 package com.example.leaflog.util
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -103,7 +110,11 @@ fun Navigation() {
                 navArgument("title") { type = NavType.StringType },
                 navArgument("description") { type = NavType.StringType },
                 navArgument("picture") { type = NavType.StringType }
-            )
+            ),
+            enterTransition = { NavigationAnimation.slideUpEnter },
+            exitTransition = { ExitTransition.None },
+            popExitTransition = { NavigationAnimation.slideDownExit },
+            popEnterTransition = { EnterTransition.None }
         ) {
             JournalDetailsScreen(
                 journalId = it.arguments?.getInt("journalId") ?: 0,
@@ -121,7 +132,13 @@ fun Navigation() {
                 }
             )
         }
-        composable(route = Routes.PostJournal.name) {
+        composable(
+            route = Routes.PostJournal.name,
+            enterTransition = { NavigationAnimation.slideUpEnter },
+            exitTransition = { ExitTransition.None },
+            popExitTransition = { NavigationAnimation.slideDownExit },
+            popEnterTransition = { EnterTransition.None }
+        ) {
             SetJournalScreen(
                 goBack = {
                     navController.popBackStack()
@@ -152,7 +169,11 @@ fun Navigation() {
             route = "${Routes.PostLog.name}/{journalId}",
             arguments = listOf(
                 navArgument("journalId") { type = NavType.IntType },
-            )
+            ),
+            enterTransition = { NavigationAnimation.slideUpEnter },
+            exitTransition = { ExitTransition.None },
+            popExitTransition = { NavigationAnimation.slideDownExit },
+            popEnterTransition = { EnterTransition.None }
         ) {
             val journalId = it.arguments?.getInt("journalId") ?: 0
             val viewModel = viewModel(it) {
@@ -178,7 +199,11 @@ fun Navigation() {
             )
         }
         composable(
-            route = Routes.GetData.name
+            route = Routes.GetData.name,
+            enterTransition = { NavigationAnimation.slideIn },
+            exitTransition = { ExitTransition.None },
+            popExitTransition = { NavigationAnimation.slideOut},
+            popEnterTransition = { EnterTransition.None }
         ) {
             val parent = remember {
                 navController.previousBackStackEntry!!
@@ -193,7 +218,11 @@ fun Navigation() {
         }
         composable(
             route = "${Routes.Logs.name}/{journalId}",
-            arguments = listOf(navArgument("journalId"){ type = NavType.IntType })
+            arguments = listOf(navArgument("journalId"){ type = NavType.IntType }),
+            enterTransition = { NavigationAnimation.slideIn },
+            exitTransition = { ExitTransition.None },
+            popExitTransition = { NavigationAnimation.slideOut },
+            popEnterTransition = { EnterTransition.None }
         ) {
             val journalId = it.arguments?.getInt("journalId") ?: 0
             LogsScreen(
@@ -214,7 +243,11 @@ fun Navigation() {
             arguments = listOf(
                 navArgument("journalId"){ type = NavType.IntType },
                 navArgument("logId"){ type = NavType.IntType }
-            )
+            ),
+            enterTransition = { NavigationAnimation.slideUpEnter },
+            exitTransition = { ExitTransition.None },
+            popExitTransition = { NavigationAnimation.slideDownExit },
+            popEnterTransition = { EnterTransition.None }
         ) {
             val journalId = it.arguments?.getInt("journalId") ?: 0
             val logId = it.arguments?.getInt("logId") ?: 0
@@ -283,7 +316,11 @@ fun Navigation() {
                 navArgument("relativeHumidity") { nullable = true },
                 navArgument("lightLevel") { nullable = true },
                 navArgument("created") { type = NavType.LongType },
-            )
+            ),
+            enterTransition = { NavigationAnimation.slideUpEnter },
+            exitTransition = { ExitTransition.None },
+            popExitTransition = { NavigationAnimation.slideDownExit },
+            popEnterTransition = { EnterTransition.None }
         ) {
             val title = URLDecoder.decode(it.arguments?.getString("title") ?: "", "utf-8")
             val description = URLDecoder.decode(it.arguments?.getString("description") ?: "", "utf-8")
@@ -336,5 +373,52 @@ fun NavController.navigateWithPopUpTo(route: String, restore: Boolean = false) {
         }
         launchSingleTop = true
         restoreState = restore
+    }
+}
+
+object NavigationAnimation {
+    val slideIn: EnterTransition = slideInHorizontally(
+        animationSpec = tween(
+            durationMillis = 500
+        )
+    ) { fullWidth ->
+        fullWidth
+    }
+    val slideInExit: ExitTransition = slideOutHorizontally(
+        animationSpec = tween(
+            durationMillis = 500
+        )
+    ) { fullWidth ->
+        -fullWidth
+    }
+    val slideOut: ExitTransition = slideOutHorizontally(
+        animationSpec = tween(
+            durationMillis = 500
+        )
+    ) { fullWidth ->
+        fullWidth
+    }
+    val slideOutEnter: EnterTransition = slideInHorizontally(
+        animationSpec = tween(
+            durationMillis = 500
+        )
+    ) { fullWidth ->
+        -fullWidth
+    }
+
+    val slideUpEnter: EnterTransition = slideInVertically(
+        animationSpec = tween(
+            durationMillis = 500
+        )
+    ) { fullHeight ->
+        fullHeight
+    }
+
+    val slideDownExit: ExitTransition = slideOutVertically(
+        animationSpec = tween(
+            durationMillis = 500
+        )
+    ) { fullHeight ->
+        fullHeight
     }
 }
