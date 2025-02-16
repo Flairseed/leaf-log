@@ -7,13 +7,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,11 +21,8 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -38,7 +33,7 @@ import com.example.leaflog.ui.theme.LeafLogTheme
 fun BarChart(
     modifier: Modifier = Modifier,
     values: List<Float>,
-    maxBarHeight: Dp = 200.dp,
+    maxCanvasHeight: Dp = 270.dp,
     title: String,
     verticalAxis: String,
     horizontalAxis: String
@@ -48,7 +43,7 @@ fun BarChart(
     val primary = Color(0xFF2E5B00)
 
     val maxValue = values.max()
-    val maxHeight = maxBarHeight + 70.dp
+    val maxBarHeight = maxCanvasHeight + 70.dp
 
     val arrowWidth = 7.dp
 
@@ -67,7 +62,7 @@ fun BarChart(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(maxHeight)
+                .height(maxCanvasHeight)
                 .background(surfaceContainer)
                 .padding(
                     top = 30.dp,
@@ -200,7 +195,7 @@ fun BarChart(
                     }
                 }
                 .align(Alignment.CenterStart)
-                .width(maxHeight - 100.dp)
+                .width(maxCanvasHeight - 100.dp)
                 .rotate(-90f)
                 .horizontalScroll(verticalAxisScroll),
             text = verticalAxis,
