@@ -133,12 +133,12 @@ fun LineChart(
             val maxPlotHeight = size.height - 100
             for (i in finalValues.indices) {
                 val value = finalValues[i]
-                val y = size.height - (value.div(maxValue)) * maxPlotHeight - bottomOffset
+                val y = size.height - (if (maxValue != 0f) (value / maxValue) else 0f) * maxPlotHeight - bottomOffset
                 val x = i * distBetweenPoints + leftOffset
                 // Lines
                 if (i < finalValues.size - 1) {
                     val value2 = finalValues[i + 1]
-                    val y2 = size.height - (value2.div(maxValue)) * maxPlotHeight - bottomOffset
+                    val y2 = size.height - (if (maxValue != 0f) (value2 / maxValue) else 0f) * maxPlotHeight - bottomOffset
                     val x2 = (i + 1) * distBetweenPoints + leftOffset
                     drawLine(
                         color = primaryContainer,
@@ -156,7 +156,7 @@ fun LineChart(
                         color = onSurface,
                         background = surfaceContainer
                     ),
-                    topLeft = Offset(x+15f, y-10f)
+                    topLeft = Offset(x+15f, y-11f)
                 )
                 // Plots
                 drawCircle(
