@@ -48,8 +48,8 @@ fun CustomButton(
                     imageVector = leadingIcon,
                     contentDescription = ""
                 )
-                Text(text = label)
             }
+            Text(text = label)
         }
     }
 }
