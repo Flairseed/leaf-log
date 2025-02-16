@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.leaflog.core.presentation.component.CustomButton
@@ -39,6 +40,10 @@ fun AnalyticsScreen(
     snackBarHostState: SnackbarHostState,
     padding: PaddingValues
 ) {
+    val primaryContainer = Color(0xFF4C821C)
+    val secondary = Color(0xFF446557)
+    val tertiary = Color(0xFF23523E)
+
     val scrollState = rememberScrollState()
 
     LaunchedEffect(key1 = true) {
@@ -99,16 +104,32 @@ fun AnalyticsScreen(
                 CustomButton(
                     modifier = Modifier.width(180.dp),
                     label = "Refresh Journals",
-                    leadingIcon = Icons.Default.Refresh
+                    leadingIcon = Icons.Default.Refresh,
+                    color = primaryContainer
                 ) {
                     viewModel.getJournals()
                 }
                 CustomButton(
                     modifier = Modifier.width(180.dp),
                     label = "Refresh Logs",
-                    leadingIcon = Icons.Default.Refresh
+                    leadingIcon = Icons.Default.Refresh,
+                    color = secondary
                 ) {
                     viewModel.getLogs()
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Relative: ${state.relative}")
+                CustomButton(
+                    modifier = Modifier.width(180.dp),
+                    label = "Toggle relative",
+                    color = tertiary
+                ) {
+                    viewModel.toggleRelative()
                 }
             }
             Row(
@@ -154,7 +175,8 @@ fun AnalyticsScreen(
                     },
                     title = "Water given over time",
                     horizontalAxis = "Log",
-                    verticalAxis = "Water (ml)"
+                    verticalAxis = "Water (ml)",
+                    relative = state.relative
                 )
 
                 LineChart(
@@ -163,7 +185,8 @@ fun AnalyticsScreen(
                     },
                     title = "Height of plant over time",
                     horizontalAxis = "Log",
-                    verticalAxis = "Height (cm)"
+                    verticalAxis = "Height (cm)",
+                    relative = state.relative
                 )
             }
         }

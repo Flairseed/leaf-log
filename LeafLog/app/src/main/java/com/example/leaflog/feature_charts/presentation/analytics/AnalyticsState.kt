@@ -8,5 +8,6 @@ data class AnalyticsState(
     val logPages: List<List<Log>> = listOf(),
     val currentJournalIndex: Int = 0,
     val currentLogsPage: Int = 0,
+    val relative: Boolean = false,
     val isLoading: Boolean = false
 )

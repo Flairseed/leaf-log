@@ -36,13 +36,15 @@ fun BarChart(
     maxCanvasHeight: Dp = 270.dp,
     title: String,
     verticalAxis: String,
-    horizontalAxis: String
+    horizontalAxis: String,
+    relative: Boolean = false
 ) {
     val surfaceContainer = Color(0xFFF3EDE9)
     val onSurface = Color(0xFF1D1B19)
     val primary = Color(0xFF2E5B00)
 
     val maxValue = values.max()
+    val minValue = values.min()
     val maxBarHeight = maxCanvasHeight + 70.dp
 
     val arrowWidth = 7.dp
@@ -136,7 +138,11 @@ fun BarChart(
                     null
                 }
 
-                val height = (value?.div(maxValue) ?: 0f) * maxBarHeight.value
+                val height = if (relative) {
+                    (value?.minus(minValue)?.div(maxValue - minValue) ?: 0f) * maxBarHeight.value
+                } else {
+                    (value?.div(maxValue) ?: 0f) * maxBarHeight.value
+                }
 
                 Column(
                     modifier = Modifier
@@ -213,7 +219,7 @@ fun BarChart(
 private fun PreviewBarChart() {
     LeafLogTheme {
         BarChart(
-            values = listOf(50f, 20f, 60f, 70f),
+            values = listOf(40f, 20f, 60f, 30f),
             title = "Water given over time",
             horizontalAxis = "Log",
             verticalAxis = "Water (ml)"

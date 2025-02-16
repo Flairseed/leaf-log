@@ -38,6 +38,10 @@ class AnalyticsViewModel(
         }
     }
 
+    fun toggleRelative() {
+        state = state.copy(relative = !state.relative)
+    }
+
     fun goNextPage() {
         if (state.currentLogsPage < state.logPages.lastIndex) {
             state = state.copy(currentLogsPage = state.currentLogsPage + 1)

@@ -36,7 +36,8 @@ fun LineChart(
     maxCanvasHeight: Dp = 270.dp,
     title: String,
     verticalAxis: String,
-    horizontalAxis: String
+    horizontalAxis: String,
+    relative: Boolean = false
 ) {
     val surfaceContainer = Color(0xFFF3EDE9)
     val onSurface = Color(0xFF1D1B19)
@@ -44,6 +45,7 @@ fun LineChart(
     val primaryContainer = Color(0xFF4C821C)
 
     val maxValue = values.max()
+    val minValue = values.min()
 
     val arrowWidth = 7.dp
 
@@ -133,12 +135,12 @@ fun LineChart(
             val maxPlotHeight = size.height - 100
             for (i in finalValues.indices) {
                 val value = finalValues[i]
-                val y = size.height - (if (maxValue != 0f) (value / maxValue) else 0f) * maxPlotHeight - bottomOffset
+                val y = size.height - (if (maxValue != 0f) (if (relative) (if (value != minValue) ((value - minValue) / (maxValue - minValue)) else 0f) else (value / maxValue)) else 0f) * maxPlotHeight - bottomOffset
                 val x = i * distBetweenPoints + leftOffset
                 // Lines
                 if (i < finalValues.size - 1) {
                     val value2 = finalValues[i + 1]
-                    val y2 = size.height - (if (maxValue != 0f) (value2 / maxValue) else 0f) * maxPlotHeight - bottomOffset
+                    val y2 = size.height - (if (maxValue != 0f) (if (relative) (if (value != minValue) ((value - minValue) / (maxValue - minValue)) else 0f) else (value2 / maxValue)) else 0f) * maxPlotHeight - bottomOffset
                     val x2 = (i + 1) * distBetweenPoints + leftOffset
                     drawLine(
                         color = primaryContainer,
