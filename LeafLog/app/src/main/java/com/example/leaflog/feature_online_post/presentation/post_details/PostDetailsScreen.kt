@@ -143,7 +143,7 @@ fun PostDetailsScreen(
                     )
                     Text(
                         modifier = Modifier.padding(top = 28.dp),
-                        text = "Light: ${lightLevel ?: "?"} lx",
+                        text = "Light: ${lightLevel ?: "-"} lx",
                         fontFamily = schoolBellFamily,
                         fontSize = 15.sp
                     )
@@ -158,13 +158,13 @@ fun PostDetailsScreen(
                     horizontalAlignment = Alignment.End
                 ) {
                     Text(
-                        text = "Temperature: ${temperature ?: "?"} °C",
+                        text = "Temperature: ${temperature ?: "-"} °C",
                         fontFamily = schoolBellFamily,
                         fontSize = 15.sp
                     )
                     Text(
                         modifier = Modifier.padding(top = 28.dp),
-                        text = "R. Humidity: ${relativeHumidity ?: "?"} %",
+                        text = "R. Humidity: ${relativeHumidity ?: "-"} %",
                         fontFamily = schoolBellFamily,
                         fontSize = 15.sp
                     )
