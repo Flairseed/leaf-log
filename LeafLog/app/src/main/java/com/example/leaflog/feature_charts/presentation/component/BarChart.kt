@@ -45,7 +45,7 @@ fun BarChart(
 
     val maxValue = values.max()
     val minValue = values.min()
-    val maxBarHeight = maxCanvasHeight + 70.dp
+    val maxBarHeight = maxCanvasHeight - 70.dp
 
     val arrowWidth = 7.dp
 
