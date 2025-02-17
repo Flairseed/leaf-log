@@ -31,9 +31,9 @@ fun jsonToPost(postJson: JSONObject): GetPostModel {
         description = postJson["description"] as String,
         height = (postJson["height"] as String).toFloat(),
         water = postJson["water"] as Int,
-        lightLevel = (postJson["light_level"] as String).toFloat(),
-        relativeHumidity = postJson["relative_humidity"] as Int,
-        temperature = postJson["temperature"] as Int,
+        lightLevel = if (!postJson.isNull("light_level")) (postJson["light_level"] as String).toFloat() else null,
+        relativeHumidity = if (!postJson.isNull("relative_humidity")) (postJson["relative_humidity"] as Int) else null,
+        temperature = if (!postJson.isNull("temperature")) (postJson["temperature"] as Int) else null,
         picture = postJson["picture"] as String,
         created = dateTimeFormatter.parse(postJson["created"] as String) ?: Date(),
         timeStamp = dateTimeFormatter.parse(postJson["timestamp"] as String) ?: Date()
