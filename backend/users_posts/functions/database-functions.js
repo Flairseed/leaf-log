@@ -246,7 +246,7 @@ async function getPresignedUrl(userName = null) {
 
     const currentTime = Date.now();
     const folder = process.env.S3_FOLDER;
-    const key = `${folder}/${userName}-${currentTime}.png`;
+    const key = `${folder}/${encodeURIComponent(userName)}-${currentTime}.png`;
 
     const command = new PutObjectCommand({ Bucket: process.env.BUCKET_NAME, Key: key });
     const presignedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
