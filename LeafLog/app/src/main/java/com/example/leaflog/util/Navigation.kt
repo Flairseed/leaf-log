@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -83,19 +84,19 @@ fun Navigation() {
                     val description = URLEncoder.encode(it.description, "utf-8")
                     val picture = URLEncoder.encode(it.picture, "utf-8")
                     navController
-                        .navigate("${Routes.JournalDetails.name}/${it.id}/${title}/${description}/${picture}")
+                        .navigateOrIgnore("${Routes.JournalDetails.name}/${it.id}/${title}/${description}/${picture}")
                 },
                 onPostClicked = {
                     val encodedTitle = URLEncoder.encode(it.title, "utf-8")
                     val encodedDescription = URLEncoder.encode(it.description, "utf-8")
                     val encodedPicture = URLEncoder.encode(it.picture, "utf-8")
 
-                    navController.navigate(
+                    navController.navigateOrIgnore(
                         "${Routes.PostDetails.name}/$encodedTitle/$encodedDescription/$encodedPicture/${it.height}/${it.water}/${it.temperature}/${it.relativeHumidity}/${it.lightLevel}/${it.created.time}"
                     )
                 },
                 onFABClicked = {
-                    navController.navigate(Routes.PostJournal.name)
+                    navController.navigateOrIgnore(Routes.PostJournal.name)
                 },
                 goToLoginScreen = {
                     startDest = Routes.Login.name
@@ -122,13 +123,13 @@ fun Navigation() {
                 description = URLDecoder.decode(it.arguments?.getString("description"), "utf-8"),
                 picture = URLDecoder.decode(it.arguments?.getString("picture"), "utf-8"),
                 goBack = {
-                    navController.popBackStack()
+                    navController.popBackStackOrIgnore()
                 },
                 onEdit = { id ->
-                    navController.navigate("${Routes.UpdateJournal.name}/$id")
+                    navController.navigateOrIgnore("${Routes.UpdateJournal.name}/$id")
                 },
                 goToLogs = { journalId ->
-                    navController.navigate("${Routes.Logs.name}/$journalId")
+                    navController.navigateOrIgnore("${Routes.Logs.name}/$journalId")
                 }
             )
         }
@@ -141,7 +142,7 @@ fun Navigation() {
         ) {
             SetJournalScreen(
                 goBack = {
-                    navController.popBackStack()
+                    navController.popBackStackOrIgnore()
                 },
                 onPost = {
                     navController.navigateWithPopUpTo(Routes.Home.name)
@@ -155,7 +156,7 @@ fun Navigation() {
             SetJournalScreen(
                 postId = it.arguments?.getInt("journalId"),
                 goBack = {
-                    navController.popBackStack()
+                    navController.popBackStackOrIgnore()
                 },
                 onPost = {
                     navController.navigateWithPopUpTo(Routes.Home.name)
@@ -185,7 +186,7 @@ fun Navigation() {
             SetLogScreen(
                 viewModel = viewModel,
                 onGetData = {
-                    navController.navigate(Routes.GetData.name)
+                    navController.navigateOrIgnore(Routes.GetData.name)
                 },
                 onPost = {
                     navController.popBackStack()
@@ -194,7 +195,7 @@ fun Navigation() {
                 },
                 onUpdate = {},
                 goBack = {
-                    navController.popBackStack()
+                    navController.popBackStackOrIgnore()
                 }
             )
         }
@@ -212,7 +213,7 @@ fun Navigation() {
             GetDataScreen(
                 viewModel = viewModel,
                 goBack = {
-                    navController.popBackStack()
+                    navController.popBackStackOrIgnore()
                 }
             )
         }
@@ -228,13 +229,13 @@ fun Navigation() {
             LogsScreen(
                 journalId = journalId,
                 goBack = {
-                    navController.popBackStack()
+                    navController.popBackStackOrIgnore()
                 },
                 onJournalClicked = { log ->
-                    navController.navigate("${Routes.LogDetails.name}/$journalId/${log.id}")
+                    navController.navigateOrIgnore("${Routes.LogDetails.name}/$journalId/${log.id}")
                 },
                 onFABClicked = {
-                    navController.navigate("${Routes.PostLog.name}/$journalId")
+                    navController.navigateOrIgnore("${Routes.PostLog.name}/$journalId")
                 }
             )
         }
@@ -254,7 +255,7 @@ fun Navigation() {
             LogDetailsScreen(
                 logId = logId,
                 goBack = {
-                    navController.popBackStack()
+                    navController.popBackStackOrIgnore()
                 },
                 onDelete = {
                     navController.popBackStack()
@@ -262,7 +263,7 @@ fun Navigation() {
                     navController.navigate("${Routes.Logs.name}/$journalId")
                 },
                 goToUpdateScreen = {
-                    navController.navigate("${Routes.UpdateLog.name}/$journalId/$logId")
+                    navController.navigateOrIgnore("${Routes.UpdateLog.name}/$journalId/$logId")
                 }
             )
         }
@@ -300,7 +301,7 @@ fun Navigation() {
                     navController.navigate("${Routes.LogDetails.name}/$journalId/$logId")
                 },
                 goBack = {
-                    navController.popBackStack()
+                    navController.popBackStackOrIgnore()
                 }
             )
         }
@@ -343,7 +344,7 @@ fun Navigation() {
                 lightLevel = lightLevel,
                 created = created,
                 goBack = {
-                    navController.popBackStack()
+                    navController.popBackStackOrIgnore()
                 }
             )
         }
@@ -373,6 +374,18 @@ fun NavController.navigateWithPopUpTo(route: String, restore: Boolean = false) {
         }
         launchSingleTop = true
         restoreState = restore
+    }
+}
+
+fun NavController.popBackStackOrIgnore() {
+    if (currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED) {
+        popBackStack()
+    }
+}
+
+fun NavController.navigateOrIgnore(route: String) {
+    if (currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED) {
+        navigate(route)
     }
 }
 
